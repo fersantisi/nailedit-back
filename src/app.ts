@@ -1,6 +1,7 @@
 import express from 'express';
 import { Request } from 'express';
 import cors from 'cors';
+import mainRouter from './routes/mainRouter';
 
 const app = express();
 
@@ -21,5 +22,7 @@ app.get('/', (req, res) => {
 app.get('/fruits', (req: Request, res) => {
   res.json({ fruits: ['apple', 'banana', 'orange'] });
 });
+
+app.use('/', mainRouter);
 
 export default app;
