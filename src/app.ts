@@ -1,10 +1,13 @@
 import express from 'express';
 import { Request } from 'express';
 import cors from 'cors';
+import usersRoutes from './routes/users.routes'
 
 const app = express();
 
 const allowedOrigins = ['http://localhost:5173'];
+
+app.use(usersRoutes)
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins
