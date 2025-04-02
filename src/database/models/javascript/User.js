@@ -1,8 +1,8 @@
 import {DataTypes} from 'sequelize'
-import { sequelize } from '../database/database'
-import {Proyect} from '../models/Proyect'
+import sequelize from '../database'
+import Proyect from './Proyect'
 
-export const User = sequelize.define('users',{
+const User = sequelize.define('users',{
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -34,3 +34,5 @@ Proyect.belongsTo(User,{
     foreignKey: 'proyect_id',
     targetKey: 'id'
 })
+
+export default User

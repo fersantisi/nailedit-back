@@ -1,5 +1,5 @@
 import { DataType, DataTypes } from 'sequelize'
-import {sequelize} from '../database/database'
+import {sequelize} from '../database'
 
 
 export const Proyect = sequelize.define('proyects',{

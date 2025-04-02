@@ -7,7 +7,11 @@ const app = express();
 
 const allowedOrigins = ['http://localhost:5173'];
 
+app.use(express.json());
+
+
 app.use(usersRoutes)
+
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins
@@ -15,7 +19,7 @@ const options: cors.CorsOptions = {
 
 app.use(cors(options));
 
-app.use(express.json());
+
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

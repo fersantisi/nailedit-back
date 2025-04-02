@@ -1,11 +1,13 @@
-import { Sequelize } from 'sequelize'
+import { Sequelize } from 'sequelize-typescript'
 
-export const sequelize = new Sequelize(
-    'testing',
-    'postgres',
-    'admin',
-    {
+const sequelize = new Sequelize({
+    database: 'testing',
+    username: 'postgres',
+    password: 'admin',
     host: 'localhost',
-    dialect: 'postgres'
-    }
-)
+    port: 5432,
+    dialect: 'postgres',
+    models: [__dirname + "/models"],    
+})
+
+export default sequelize;
