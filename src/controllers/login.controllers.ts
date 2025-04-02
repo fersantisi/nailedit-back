@@ -8,7 +8,8 @@ export const getLogin = async(req: Request, res: Response) => {
 
     const {username, password} = req.body;
     try {
-        const user = await User.findOne(username)
+        console.log(username)
+        const user = await User.findOne({where: {email: username}})
 
         if(!user){
             res.status(401).json({message: "User not found"})
@@ -16,12 +17,24 @@ export const getLogin = async(req: Request, res: Response) => {
         }
 
         await bcrypt.compare(password, user.password).then((result)=>{
+
+                let token: string;
+
                 if(result){
-                    const token = jwt.sign({
-                        name: "fer",
-                    }, process.env.SECRET_KEY || "123")
+                    console.log(user)
+                    if (user.id == 1){
+                        token = jwt.sign({
+                            name: "fer",
+                            admin: true
+                        }, process.env.ADMIN_KEY || "admin")
+                    }else{
+                        token = jwt.sign({
+                            name: "fer",
+                        }, process.env.SECRET_KEY || "123")
+                    }
                     
                     res.status(200).json(token)
+
                 }else{
                     res.status(401).json({message: "wrong password"})
                 }

@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 
 
 
-const validateToken = (req:Request, res: Response, next: NextFunction)=>{
+export const validateToken = (req:Request, res: Response, next: NextFunction)=>{
 
     const hearderToken = req.headers['authorization'];
 
@@ -26,4 +26,26 @@ const validateToken = (req:Request, res: Response, next: NextFunction)=>{
     }
 }
 
-export default validateToken
+export const validateAdminToken = (req:Request, res: Response, next: NextFunction)=>{
+
+    const hearderToken = req.headers['authorization'];
+
+    if (hearderToken != undefined){
+
+        const bearerToken = hearderToken.split(" ");
+        const token = bearerToken[1];
+
+        try {
+            
+            const tokenValido = jwt.verify(token,process.env.ADMIN_KEY || "admin" )
+            console.log(tokenValido);
+            next();
+        } catch (error) {
+            res.status(401).json({message: "Token invalido"})
+        }
+
+    }else{
+        res.status(401).json({message: "Acces Denied."})
+    }
+}
+

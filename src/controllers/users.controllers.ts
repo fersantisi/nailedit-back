@@ -96,3 +96,20 @@ export const deleteUser = async (req: Request, res:Response): Promise<void> =>{
     
 }
 
+export const createAdmin = async ():Promise<void> =>{
+    
+    try {
+        const hashedPassword = bcrypt.hashSync("admin", 10);
+    
+        const newUser = await User.create({
+        name: "admin",
+        email: "admin@admin",
+        password: hashedPassword
+        })
+    } catch (error) {
+        if (error instanceof Error){
+            console.log(error)
+        }
+    }
+      
+}
