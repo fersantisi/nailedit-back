@@ -1,16 +1,17 @@
 import { Request, Response } from 'express';
 import User from '../database/models/User';
+import bcrypt from "bcrypt"
+
 
 export const getUsers = async(req: Request, res: Response):Promise<void> =>{
+
     const users = await User.findAll()
-    
     res.json(users)
     
 }
 
 export const getUser = async (req: Request, res:Response): Promise<void> =>{
 
-    console.log("reached here")
     const id = req.params.id;
     const user = await User.findByPk(id)
     if (!user){
@@ -25,23 +26,26 @@ export const createUser = async(req: Request, res: Response): Promise<void> =>{
     try {
         const {name,email,password}= req.body;
         
+        const hashedPassword = bcrypt.hashSync(password, 10);
         /**
         * verify if email is in use.
         */
         const user = await User.findOne({where:{email}});
         if (user){
-            res.status(500).json({message: 'Email alredy in use.'})
+            res.status(418).json({message: 'Email alredy in use.'})
             return
         }
 
         const newUser = await User.create({
         name,
         email,
-        password
-    })
+        password: hashedPassword
+        })
 
-    console.log(newUser)
-    res.send('creating Users')
+    
+        res.send('creating Users')
+
+
     } catch (error: unknown) {
         if (error instanceof Error) {
             res.status(500).json({message: error.message})
@@ -72,15 +76,16 @@ export const updateUser = async (req: Request, res:Response): Promise<void> =>{
 export const deleteUser = async (req: Request, res:Response): Promise<void> =>{
 
     try {
-        const {id} = req.params;
+        const id = req.params.id;
         
         
 
         await User.destroy({
-        where: {
-            id,
-        },
+            where: {
+                id,
+            },
         });
+        
         res.sendStatus(204);
 
     } catch(error: unknown) {

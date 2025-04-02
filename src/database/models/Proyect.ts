@@ -7,7 +7,6 @@ import User from "./User"
     tableName: "proyects",
     modelName: "Proyect"
 })
-
 class Proyect extends Model{
 
     @Column({

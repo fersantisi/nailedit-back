@@ -16,7 +16,7 @@ interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
     tableName: "users",
     modelName: "User"
 })
-export default class User extends Model<UserAttributes,UserCreationAttributes> {
+class User extends Model<UserAttributes,UserCreationAttributes> {
   
 
   @Column({
@@ -48,3 +48,5 @@ export default class User extends Model<UserAttributes,UserCreationAttributes> {
 
   
 }
+
+export default User
