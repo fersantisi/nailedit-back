@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../database/models/User';
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import { tokenGenerator } from './tokens/tokenGenerator';
 
 
 export const getLogin = async(req: Request, res: Response) => {
@@ -18,22 +19,23 @@ export const getLogin = async(req: Request, res: Response) => {
 
         await bcrypt.compare(password, user.password).then((result)=>{
 
-                let token: string;
+                
 
                 if(result){
-                    console.log(user)
-                    if (user.id == 1){
-                        token = jwt.sign({
-                            name: "fer",
-                            admin: true
-                        }, process.env.ADMIN_KEY || "admin")
-                    }else{
-                        token = jwt.sign({
-                            name: "fer",
-                        }, process.env.SECRET_KEY || "123")
-                    }
-                    
-                    res.status(200).json(token)
+
+                    const {authToken, refreshToken} = tokenGenerator(user);
+
+                    res.status(200).cookie('authToken',authToken,{
+                        maxAge: 1000 * 60 * 15,
+                        httpOnly: true,
+                        //secure: true
+                        //agregar secure en prod
+                    }).cookie('refreshToken',refreshToken,{
+                        maxAge: 1000 * 60 * 60 * 24 * 7,
+                        httpOnly: true,
+                        //secure: true
+                        //agregar secure en prod
+                    }).json({ message: "Login successful", admin: user.id == 1 });
 
                 }else{
                     res.status(401).json({message: "wrong password"})

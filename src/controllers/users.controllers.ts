@@ -97,6 +97,12 @@ export const deleteUser = async (req: Request, res:Response): Promise<void> =>{
 }
 
 export const createAdmin = async ():Promise<void> =>{
+
+    const user = await User.findByPk(1)
+
+    if(user != undefined){
+        return
+    }
     
     try {
         const hashedPassword = bcrypt.hashSync("admin", 10);

@@ -15,7 +15,7 @@ async function main(): Promise<void> {
   
   try {
 
-    await sequelize.sync({force:true});
+    await sequelize.sync();
     createAdmin()
     
     app.listen(config.port, () => {
