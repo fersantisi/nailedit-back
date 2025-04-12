@@ -2,10 +2,21 @@ import express from 'express';
 import { Request } from 'express';
 import cors from 'cors';
 import mainRouter from './routes/mainRouter';
+import usersRoutes from './routes/users.routes'
+import loginRoutes from './routes/login.routes'
+import cookieParser from "cookie-parser"
+
 
 const app = express();
 
-const allowedOrigins = ['http://localhost:5174'];
+const allowedOrigins = ['http://localhost:5173'];
+
+app.use(express.json());
+app.use(cookieParser())
+
+app.use(usersRoutes)
+app.use(loginRoutes)
+
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins
@@ -13,7 +24,7 @@ const options: cors.CorsOptions = {
 
 app.use(cors(options));
 
-app.use(express.json());
+
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
