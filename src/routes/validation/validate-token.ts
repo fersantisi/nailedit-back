@@ -50,10 +50,11 @@ function refreshSession(token:string, refreshToken:string, req:Request, res:Resp
             const refreshValidate = jwt.verify(refreshToken,process.env.REFRESH_KEY || "refresh123")
             const payload = jwt.verify(token,process.env.SECRET_KEY || "123", {ignoreExpiration: true})as JwtPayload;
             const { iat, exp, ...cleanPayload } = payload;
-            const newToken = regenerateToken(cleanPayload);
-            res.status(200).json()
+            const newToken = regenerateToken({name: cleanPayload.name});
+            console.log(cleanPayload)
+            res.status(418)
 
-        } catch (error) {
+        } catch (error) { 
             res.status(401).json({message: "Acces Denied"})
         }
     }else{
