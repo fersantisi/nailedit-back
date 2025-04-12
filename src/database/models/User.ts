@@ -1,6 +1,6 @@
 import {Optional} from "sequelize"
 import { Table, Column, DataType, Model, HasMany, PrimaryKey, AutoIncrement, Unique } from 'sequelize-typescript';
-import Proyect from "./Proyect"
+import Proyect from "./Project"
 
 interface UserAttributes { 
     id: string

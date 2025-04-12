@@ -5,7 +5,7 @@ import {
   updateUser,
   deleteUser,
   getUser,
-} from '../controllers/users.controllers';
+} from '../controllers/users.controller';
 import {
   validateToken,
   validateAdminToken,
