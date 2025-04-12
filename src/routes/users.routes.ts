@@ -8,7 +8,7 @@ const router = Router()
 router.get('/users',validateAdminToken, getUsers)
 router.post('/users', createUser)
 router.put('/users/:id',validateAdminToken, updateUser)
-router.delete('/users/:id',validateToken,deleteUser)
+router.delete('/users/:id',validateAdminToken,deleteUser)
 router.get('/users/:id',validateToken, getUser)
 
 export default router
