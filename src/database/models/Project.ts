@@ -3,42 +3,48 @@ import { Table, Column, DataType, Model, HasMany, PrimaryKey, AutoIncrement, Uni
 import User from "./User"
 
 @Table({
-    timestamps: true,
-    tableName: "proyects",
-    modelName: "Proyect"
+  timestamps: true,
+  tableName: 'proyects',
+  modelName: 'Proyect',
 })
-class Proyect extends Model{
+class Proyect extends Model {
+  @Column({
+    primaryKey: true,
+    type: DataType.INTEGER,
+    autoIncrement: true,
+  })
+  declare id: number;
 
-    @Column({
-        primaryKey: true,
-        type: DataType.INTEGER,
-        autoIncrement: true,
-    })
-    declare id: number;
+  @Column({
+    type: DataType.STRING,
+  })
+  declare name: string;
 
-    @ForeignKey( () => User)
-    @Column({
-        type: DataType.INTEGER
-    })
-    declare user_id: number;
+  @Column({
+    type: DataType.STRING,
+  })
+  declare description: string;
 
-    @Column({
-        type: DataType.STRING,
-    })
-    declare name: string;
+  @Column({
+    type: DataType.STRING,
+  })
+  declare category: string;
 
-    @Column({
-        type: DataType.STRING,
-    })
-    declare description: string;
+  @Column({
+    type: DataType.STRING,
+  })
+  declare image: string;
 
-    @CreatedAt
-    declare created_at: Date;
+  @Column({
+    type: DataType.STRING,
+  })
+  declare duedate: string;
 
-    @UpdatedAt
-    declare updated_at: Date;
+  @CreatedAt
+  declare created_at: Date;
 
-    
+  @UpdatedAt
+  declare updated_at: Date;
 }
 
 

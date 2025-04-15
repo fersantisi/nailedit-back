@@ -43,9 +43,6 @@ class User extends Model<UserAttributes,UserCreationAttributes> {
   })
   declare password: string;
 
-  @HasMany(() => Proyect)
-  declare proyects: Proyect[];
-
   
 }
 
