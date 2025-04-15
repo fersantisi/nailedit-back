@@ -1,113 +1,52 @@
 import { Request, Response } from 'express';
 import User from '../database/models/User';
-import bcrypt from 'bcrypt';
-
-export const getUsers = async (req: Request, res: Response): Promise<void> => {
-  const users = await User.findAll();
-  res.json(users);
-};
+import {
+  createNewUser,
+  getUserData,
+  updateUserPassword,
+} from '../services/users.service';
 
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
-  const user = await User.findByPk(id);
-  if (!user) {
-    res.status(404).json({ message: 'User not found' });
-    return;
-  }
-  res.json(user);
-};
-
-export const createUser = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+  //verify data
   try {
-    const { name, email, password } = req.body;
-
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    /**
-     * verify if email is in use.
-     */
-    const user = await User.findOne({ where: { email } });
-    if (user) {
-      res.status(418).json({ message: 'Email already in use.' });
-      return;
+    const user = await getUserData(id);
+    if (user != null) {
+      //do stuff
+      res.status(201).json(User);
+    } else {
+      res.status(400).json({ message: 'user not found' });
     }
-
-    const newUser = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
-
-    res.send('creating Users');
-  } catch (error: unknown) {
+  } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json({ message: error.message });
+      console.log(error.message);
+      res.status(500).json({
+        message:
+          'internal server error, check server console for more information',
+      });
     }
   }
 };
+
 
 export const updateUser = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   const id = req.params.id;
-  const pass = req.body;
-
-  console.log(pass);
-  const user = await User.findByPk(id);
-  if (!user) {
-    res.status(404).json({ message: 'User not found' });
-    return;
-  }
-
-  user.password = pass.password;
-
-  await user.save();
-
-  res.status(200).json({ message: 'password changed' });
-};
-
-export const deleteUser = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+  const pass = req.body.password;
+  //add validation
   try {
-    const id = req.params.id;
-
-    await User.destroy({
-      where: {
-        id,
-      },
-    });
-
-    res.sendStatus(204);
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-};
-
-export const createAdmin = async (): Promise<void> => {
-  const user = await User.findByPk(1);
-
-  if (user != undefined) {
-    return;
-  }
-
-  try {
-    const hashedPassword = bcrypt.hashSync('admin', 10);
-
-    const newUser = await User.create({
-      name: 'admin',
-      email: 'admin@admin',
-      password: hashedPassword,
-    });
+    await updateUserPassword(pass, id);
+    res.status(200).json({ message: 'password changed' });
   } catch (error) {
     if (error instanceof Error) {
-      console.log(error);
+      console.log(error.message);
+      res.status(500).json({
+        message:
+          'internal server error, check server console for more information',
+      });
     }
   }
 };
+

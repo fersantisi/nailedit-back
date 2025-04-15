@@ -1,7 +1,7 @@
 import app from './app';
 import config from './config/config';
 import sequelize from './database/database';
-import { createAdmin } from './controllers/users.controller';
+import { createAdmin } from './services/users.service';
 
 async function main(): Promise<void> {
   try {

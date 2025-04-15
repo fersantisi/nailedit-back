@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import {
   regenerateToken,
   regenerateAdminToken,
-} from '../controllers/tokens/tokenGenerator';
+} from '../utils/jwt';
 
 export const validateToken = (
   req: Request,
