@@ -93,7 +93,7 @@ export const createAdmin = async (): Promise<void> => {
 
     const newUser = await User.create({
       name: 'admin',
-      email: 'admin@admin',
+      email: 'admin@admin.com',
       password: hashedPassword,
     });
   } catch (error) {
