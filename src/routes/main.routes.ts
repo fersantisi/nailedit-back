@@ -13,6 +13,6 @@ router.use('/users', usersRoutes);
 router.use('/login', loginRoutes);
 router.use('/project', projectRoutes);
 router.use('/auth',authRoutes);
-router.use('./admin', adminRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;

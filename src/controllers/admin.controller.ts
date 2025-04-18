@@ -7,8 +7,9 @@ import {
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = getAllUsers();
+    const users = await getAllUsers();
     res.json(users);
+    console.log(users)
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
