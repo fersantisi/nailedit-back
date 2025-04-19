@@ -2,7 +2,7 @@ import User from '../database/models/User';
 import bcrypt from 'bcrypt';
 
 export const createNewUser = async (
-  name: string,
+  username: string,
   email: string,
   password: string,
 ): Promise<boolean> => {
@@ -11,13 +11,15 @@ export const createNewUser = async (
     /**
      * verify if email is in use.
      */
-    const user = await User.findOne({ where: { email } });
+    const { Op } = require('sequelize');
+
+    const user = await User.findOne({ where: {[Op.or]: [{email}, {username}]}});
     if (user) {
       return false;
     }
 
     const newUser = await User.create({
-      name,
+      username,
       email,
       password: hashedPassword,
     });
@@ -92,7 +94,7 @@ export const createAdmin = async (): Promise<void> => {
     const hashedPassword = bcrypt.hashSync('admin', 10);
 
     const newUser = await User.create({
-      name: 'admin',
+      username: 'admin',
       email: 'admin@admin',
       password: hashedPassword,
     });

@@ -10,7 +10,7 @@ export const tokenGenerator = (user:User):{authToken: string, refreshToken: stri
 
     if (user.id == 1){
         authToken = jwt.sign({
-            name: user.name,
+            name: user.username,
             admin: true
         }, process.env.ADMIN_KEY || "admin",{ expiresIn: "15m" })
 
@@ -23,7 +23,7 @@ export const tokenGenerator = (user:User):{authToken: string, refreshToken: stri
 
     }else{
         authToken = jwt.sign({
-            name: user.name,
+            name: user.username,
         }, process.env.SECRET_KEY || "123",{ expiresIn: "15m" })
 
         refreshToken = jwt.sign({

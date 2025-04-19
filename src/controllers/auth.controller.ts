@@ -43,7 +43,7 @@ export const createUser = async (
     if (await createNewUser(name, email, password)) {
       res.status(201).json({ message: 'user Created' });
     } else {
-      res.status(409).json({ message: 'Email alredy in use' });
+      res.status(409).json({ message: 'Email or Username alredy in use' });
     }
   } catch (error: unknown) {
     if (error instanceof Error) {

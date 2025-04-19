@@ -6,7 +6,7 @@ export const logIn = async (
   username: string,
   password: string,
 ): Promise<{ authToken: string; refreshToken: string } | null> => {
-  const user = await User.findOne({ where: { email: username } });
+  const user = await User.findOne({ where: { username } });
   if (!user) {
     return null;
   }

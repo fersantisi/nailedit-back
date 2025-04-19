@@ -1,10 +1,10 @@
 import {Optional} from "sequelize"
-import { Table, Column, DataType, Model, HasMany, PrimaryKey, AutoIncrement, Unique } from 'sequelize-typescript';
+import { Table, Column, DataType, Model, HasMany, PrimaryKey, AutoIncrement, Unique, ForeignKey } from 'sequelize-typescript';
 import Proyect from "./Project"
 
 interface UserAttributes { 
-    id: string
-    name: string
+    id: number
+    username: string
     email: string
     password: string
 }
@@ -18,7 +18,6 @@ interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
 })
 class User extends Model<UserAttributes,UserCreationAttributes> {
   
-
   @Column({
     primaryKey: true,
     type: DataType.INTEGER,
@@ -26,11 +25,11 @@ class User extends Model<UserAttributes,UserCreationAttributes> {
   })
   declare id: number;
  
-
+  @Unique
   @Column({
     type: DataType.STRING,
   })
-  declare name: string; 
+  declare username: string; 
 
   @Unique
   @Column({
@@ -43,7 +42,8 @@ class User extends Model<UserAttributes,UserCreationAttributes> {
   })
   declare password: string;
 
-  
+  @HasMany(() => Proyect)
+  declare proyects: Proyect[];
 }
 
 export default User
