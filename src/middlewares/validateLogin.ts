@@ -1,29 +1,28 @@
 import { Response, Request, NextFunction } from 'express';
-import { valitdatePasswordLogin } from '../validators/validatePassword';
-import { validateEmail } from '../validators/validateEmail';
-import { emitWarning } from 'process';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { LoginDto } from '../dtos/loginDto';
+import { error } from 'console';
 
-export const validateLogin = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { username, password } = req.body;
+export const validateLogin = async(
+  data:string
+):Promise<LoginDto> => {
 
-  if (!username || !password) {
-    res.status(400).json({ message: 'Missing parameters' });
-    return;
+  const dtoInstance = plainToInstance(LoginDto, data);
+
+  const errors = await validate(dtoInstance)
+
+
+  if (errors.length > 0) {
+
+    const errorMessages = errors.map(err => {
+      const constraints = err.constraints ? Object.values(err.constraints).join(', ') : 'Invalid value';
+      return `${err.property}: ${constraints}`;
+    });
+
   }
-
-  if (!valitdatePasswordLogin(password)) {
-    res.status(400).json({ message: 'Invalid password' });
-    return;
-  }
-
-  if (!validateEmail(username)) {
-    res.status(400).json({ message: 'Invalid email' });
-    return;
-  }
-
-  next();
+  
+  return dtoInstance;
+      
+  
 };

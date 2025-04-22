@@ -4,13 +4,22 @@ import { logIn } from '../services/login.service';
 import {
   createNewUser,
 } from '../services/users.service';
+import { LoginDto } from '../dtos/loginDto'
+import { validateLogin } from '../middlewares/validateLogin';
 
 
 export const getLogin = async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  //verify data
+  let login:LoginDto;
+
   try {
-    const tokens = await logIn(username, password);
+    login = await validateLogin(req.body);
+  } catch (error) {
+    return res.status(400).json({error});
+  }
+  
+  
+  try {
+    const tokens = await logIn(login.name, login.password);
     if (tokens === null) {
       res.status(409).json({ message: 'invalid credentials.' });
     } else if (tokens) {
