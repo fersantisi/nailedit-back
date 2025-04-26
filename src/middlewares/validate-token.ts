@@ -4,6 +4,7 @@ import {
   regenerateToken,
   regenerateAdminToken,
 } from '../utils/jwt';
+import { getTokenPayload } from '../services/token.service';
 
 export const validateToken = (
   req: Request,
@@ -65,9 +66,7 @@ function refreshSession(
         refreshToken,
         process.env.REFRESH_KEY || 'refresh123',
       );
-      const payload = jwt.verify(token, process.env.SECRET_KEY || '123', {
-        ignoreExpiration: true,
-      }) as JwtPayload;
+      const payload =getTokenPayload(token);
       const { iat, exp, ...cleanPayload } = payload;
       const newToken = regenerateToken({ name: cleanPayload.name });
 

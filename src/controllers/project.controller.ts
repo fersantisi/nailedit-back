@@ -1,16 +1,23 @@
 import { Request, Response } from 'express';
 import Project from '../database/models/Project';
+import { ProjectDto } from '../dtos/ProjectDto';
+import { getUserData } from '../services/users.service';
 
-export const createProject = async (req: Request, res: Response): Promise<void> => {
+export const create = async (req: Request, res: Response): Promise<void> => {
+
+
+
   try {
-    const { name, description, category, image, duedate } = req.body;
 
-    console.log(duedate);
+    const userId = getUserDataJwt(req.cookies.authToken);
 
-    
+    const { name, description, category, image, dueDate } = req.body;
 
-    
-    if (project) {
+    const project:ProjectDto = new ProjectDto(name, description, category, image, dueDate, userId)
+
+
+    const existingProject = await Project.findOne({ where: { name } });
+    if (existingProject) {
       res.status(418).json({ message: 'Project name already in use.' });
       return;
     }
@@ -20,12 +27,17 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
       description,
       category,
       image,
-      duedate,
+      dueDate,
     });
+
 
     res.status(201).json({
       message: 'Project created',
-      ...newProject,
+      name,
+      description,
+      category,
+      image,
+      dueDate,
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -34,16 +46,4 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const deleteProject = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  const id = req.params.id;
-  const project = await Project.findByPk(id);
-  if (!project) {
-    res.status(404).json({ message: 'Project not found' });
-    return;
-  }
-  await Project.destroy({ where: { id } });
-  res.json({ message: 'Project deleted' });
-};
+

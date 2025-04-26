@@ -1,4 +1,3 @@
-import { Request, Response } from 'express';
 import User from '../database/models/User';
 import jwt from "jsonwebtoken"
 
@@ -24,6 +23,7 @@ export const tokenGenerator = (user:User):{authToken: string, refreshToken: stri
     }else{
         authToken = jwt.sign({
             name: user.username,
+            userId: user.id,
         }, process.env.SECRET_KEY || "123",{ expiresIn: "15m" })
 
         refreshToken = jwt.sign({

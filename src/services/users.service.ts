@@ -1,5 +1,6 @@
 import User from '../database/models/User';
 import bcrypt from 'bcrypt';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export const createNewUser = async (
   username: string,
@@ -40,6 +41,21 @@ export const getUserData = async (id: string): Promise<User | null> => {
     throw error;
   }
 };
+
+export const getUserDataJwt = async (token:string): Promise<User | null> => {
+  try {
+    const payload = jwt.verify(token, process.env.SECRET_KEY);
+    const userId = payload.userId;
+    const user = await User.findByPk(id);
+    if (!user) {
+      return null;
+    }
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export const getAllUsers = async (): Promise<User[]> => {
   try {
