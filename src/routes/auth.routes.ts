@@ -4,7 +4,7 @@ import { createUser, getLogin } from "../controllers/auth.controller";
 const router = Router()
 
 
-router.get('/login', getLogin)
-router.post('/', createUser);
+router.post('/login', getLogin)
+router.post('/register', createUser);
 
 export default router
