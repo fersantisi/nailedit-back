@@ -5,6 +5,7 @@ import {
   getUserData,
   updateUserPassword,
 } from '../services/users.service';
+import { verify } from 'crypto';
 
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
@@ -28,7 +29,6 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
 export const updateUser = async (
   req: Request,
   res: Response,
@@ -49,4 +49,5 @@ export const updateUser = async (
     }
   }
 };
+
 

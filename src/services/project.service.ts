@@ -1,15 +1,80 @@
 import { error } from 'console';
 import Project from '../database/models/Project';
 import { ProjectDto } from '../dtos/ProjectDto';
+import { ProjectDataDto } from '../dtos/ProjectDataDto';
 
+export const createProject = async (project: ProjectDto) => {
 
-export const createProject = async(project:ProjectDto)=>{
-
-    const existingProject = await Project.findOne({ where: { name: project.name } });
-
+  try {
+    const existingProject = await Project.findOne({
+      where: { name: project.name },
+    });
+  
     if (existingProject) {
       throw new Error('Project name already in use.');
     }
   
-}
+    const newProject = await Project.create({
+      name: project.name,
+      description: project.description,
+      category: project.category,
+      image: project.image,
+      dueDate: project.duedate,
+      userid: project.userId,
+    });
+    console.log(newProject);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+  }
+  
+};
 
+export const deleteProject = async (projectId: string) => {
+  try {
+    const project = await Project.findByPk(projectId);
+    if (!project) {
+      throw new Error('Project not found');
+    }
+
+    await project.destroy();
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+  }
+};
+
+export const getProject = async (
+  projectId: string,
+): Promise<ProjectDataDto> => {
+  try {
+    const project = await Project.findByPk(projectId);
+    if (!project) {
+      throw new Error('Project not found');
+    }
+
+    const projectDTO: ProjectDataDto = new ProjectDataDto(
+      project.name,
+      project.description,
+      project.category,
+      project.image,
+      project.duedate,
+      project.created_at,
+      project.updated_at,
+    );
+
+    return projectDTO
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error("Server error, check server console for more information")
+  }
+};
+
+
+
+//export const modifyProject = async(projectId: ProjectDto)

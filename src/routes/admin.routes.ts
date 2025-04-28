@@ -4,7 +4,7 @@ import { validateAdminToken } from "../middlewares/validate-token";
 
 const router = Router()
 
-router.put('/:id', validateAdminToken, deleteAUser);
-router.get('/',validateAdminToken, getUsers)
+router.delete('/:id',deleteAUser);
+router.get('/', getUsers)
 
 export default router

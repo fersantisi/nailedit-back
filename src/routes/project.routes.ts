@@ -1,8 +1,9 @@
 import { Router } from 'express';
 const router = Router();
-import { createProject, deleteProject } from '../controllers/project.controller';
+import { createNewProject, deleteAProject} from '../controllers/project.controller';
 
-router.post('/create/', createProject);
-router.delete('/delete/:id', deleteProject);
+router.post('/create', createNewProject);
+router.delete('/delete/:id', deleteAProject);
+router.put('/update', )
 
 export default router;

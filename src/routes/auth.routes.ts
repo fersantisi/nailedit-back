@@ -5,6 +5,7 @@ const router = Router()
 
 
 router.get('/login', getLogin)
-router.post('/', createUser);
+router.post('/signin', createUser);
+//router.post('/forgot-password', recoverPassword)
 
 export default router

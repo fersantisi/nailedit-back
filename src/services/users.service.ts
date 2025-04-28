@@ -44,9 +44,9 @@ export const getUserData = async (id: string): Promise<User | null> => {
 
 export const getUserDataJwt = async (token:string): Promise<User | null> => {
   try {
-    const payload = jwt.verify(token, process.env.SECRET_KEY);
+    const payload = jwt.verify(token, process.env.SECRET_KEY || "123") as JwtPayload;
     const userId = payload.userId;
-    const user = await User.findByPk(id);
+    const user = await User.findByPk(userId);
     if (!user) {
       return null;
     }
@@ -82,6 +82,7 @@ export const updateUserPassword = async (
 };
 
 export const deleteUser = async (id:string): Promise<boolean> => {
+  
   try {
     const user = await User.findByPk(id);
     if (!user) {
@@ -120,3 +121,16 @@ export const createAdmin = async (): Promise<void> => {
     }
   }
 };
+
+export const verifyEmail = async (email:string): Promise<boolean> =>{
+
+  try {
+    const user = await User.findOne({where: {email: email}})
+    if (!user) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}

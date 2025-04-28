@@ -7,7 +7,7 @@ import User from "./User"
   tableName: 'projects',
   modelName: 'Project',
 })
-class Proyect extends Model {
+class Project extends Model {
   @Column({
     primaryKey: true,
     type: DataType.INTEGER,
@@ -52,10 +52,12 @@ class Proyect extends Model {
   @UpdatedAt
   declare updated_at: Date;
 
-  @BelongsTo(()=>User)
+  @BelongsTo(()=>User, {
+    onDelete: 'CASCADE',
+  })
   declare user: User;
 }
 
 
 
-export default Proyect
+export default Project
