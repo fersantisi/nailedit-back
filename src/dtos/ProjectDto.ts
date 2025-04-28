@@ -1,4 +1,4 @@
-import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsDate, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 
 
@@ -21,7 +21,7 @@ export class ProjectDto{
     declare image: string;
 
     @IsOptional()
-    @IsDateString()
+    @IsDate()
     declare duedate: string;
 
     @IsNotEmpty()

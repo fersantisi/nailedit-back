@@ -26,6 +26,7 @@ export const createProject = async (project: ProjectDto) => {
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
+      throw new Error('Project name already in use.');
     }
   }
   

@@ -7,6 +7,7 @@ import {
   getProject,
 } from '../services/project.service';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
+import { validateOrReject } from 'class-validator';
 
 export const createNewProject = async (
   req: Request,
@@ -17,7 +18,6 @@ export const createNewProject = async (
 
     const { name, description, category, image, dueDate } = req.body;
 
-    console.log('reached 2');
     const project: ProjectDto = new ProjectDto(
       name,
       description,
@@ -26,14 +26,31 @@ export const createNewProject = async (
       dueDate,
       userId,
     );
+
+    console.log(project);
+
+    await validateOrReject(project);
+
     await createProject(project);
 
     res.status(201).json({
       message: 'Project created',
     });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+    console.log(error);
+    if (Array.isArray(error)) {
+      // Validation error from class-validator
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: error.map((err) => ({
+          property: err.property,
+          constraints: err.constraints,
+        })),
+      });
+    } else if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
     }
   }
 };

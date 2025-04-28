@@ -5,7 +5,7 @@ import { createAdmin } from './services/users.service';
 
 async function main(): Promise<void> {
   try {
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ force: false });
     createAdmin();
 
     app.listen(config.port, () => {
