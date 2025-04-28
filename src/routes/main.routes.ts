@@ -6,11 +6,7 @@ import projectRoutes from './project.routes';
 import authRoutes from './auth.routes'
 import adminRoutes from './admin.routes'
 
-
-
-
 router.use('/users', usersRoutes);
-router.use('/login', loginRoutes);
 router.use('/project', projectRoutes);
 router.use('/auth',authRoutes);
 router.use('/admin', adminRoutes);
