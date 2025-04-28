@@ -1,8 +1,9 @@
 import User from '../database/models/User';
 import bcrypt from 'bcrypt';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export const createNewUser = async (
-  name: string,
+  username: string,
   email: string,
   password: string,
 ): Promise<boolean> => {
@@ -11,13 +12,15 @@ export const createNewUser = async (
     /**
      * verify if email is in use.
      */
-    const user = await User.findOne({ where: { email } });
+    const { Op } = require('sequelize');
+
+    const user = await User.findOne({ where: {[Op.or]: [{email}, {username}]}});
     if (user) {
       return false;
     }
 
     const newUser = await User.create({
-      name,
+      username,
       email,
       password: hashedPassword,
     });
@@ -38,6 +41,21 @@ export const getUserData = async (id: string): Promise<User | null> => {
     throw error;
   }
 };
+
+export const getUserDataJwt = async (token:string): Promise<User | null> => {
+  try {
+    const payload = jwt.verify(token, process.env.SECRET_KEY || "123") as JwtPayload;
+    const userId = payload.userId;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return null;
+    }
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export const getAllUsers = async (): Promise<User[]> => {
   try {
@@ -64,6 +82,7 @@ export const updateUserPassword = async (
 };
 
 export const deleteUser = async (id:string): Promise<boolean> => {
+  
   try {
     const user = await User.findByPk(id);
     if (!user) {
@@ -92,7 +111,7 @@ export const createAdmin = async (): Promise<void> => {
     const hashedPassword = bcrypt.hashSync('admin', 10);
 
     const newUser = await User.create({
-      name: 'admin',
+      username: 'admin',
       email: 'admin@admin',
       password: hashedPassword,
     });
@@ -102,3 +121,16 @@ export const createAdmin = async (): Promise<void> => {
     }
   }
 };
+
+export const verifyEmail = async (email:string): Promise<boolean> =>{
+
+  try {
+    const user = await User.findOne({where: {email: email}})
+    if (!user) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}

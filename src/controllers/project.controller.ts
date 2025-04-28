@@ -1,52 +1,80 @@
 import { Request, Response } from 'express';
-import Project from '../database/models/Project';
+import { ProjectDto } from '../dtos/ProjectDto';
+import { getTokenPayload } from '../services/token.service';
+import {
+  createProject,
+  deleteProject,
+  getProject,
+} from '../services/project.service';
+import { ProjectDataDto } from '../dtos/ProjectDataDto';
 
-export const createProject = async (req: Request, res: Response): Promise<void> => {
+export const createNewProject = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
-    const { name, description, category, image, duedate } = req.body;
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
 
-    console.log(duedate);
+    const { name, description, category, image, dueDate } = req.body;
 
-    if (!name) {
-      res.status(400).json({ message: 'Name field is required' });
-      return;
-    }
-
-    const project = await Project.findOne({ where: { name } });
-    if (project) {
-      res.status(418).json({ message: 'Project name already in use.' });
-      return;
-    }
-
-    const newProject = await Project.create({
+    console.log('reached 2');
+    const project: ProjectDto = new ProjectDto(
       name,
       description,
       category,
       image,
-      duedate,
-    });
+      dueDate,
+      userId,
+    );
+    await createProject(project);
 
     res.status(201).json({
       message: 'Project created',
-      ...newProject,
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res.status(500).json({ message: error.message });
+      res.status(418).json({ message: error.message });
     }
   }
 };
 
-export const deleteProject = async (
+export const deleteAProject = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const id = req.params.id;
-  const project = await Project.findByPk(id);
-  if (!project) {
-    res.status(404).json({ message: 'Project not found' });
-    return;
+  try {
+    const projectId = req.params.id;
+    console.log(projectId);
+    await deleteProject(projectId);
+    res.status(200).json({
+      message: 'Project deleted',
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
   }
-  await Project.destroy({ where: { id } });
-  res.json({ message: 'Project deleted' });
+};
+
+export const getAProject = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectId = req.params.id;
+    const project: ProjectDataDto = await getProject(projectId);
+
+    res.status(201).json(project);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+};
+
+export const modifyAProject = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  
 };

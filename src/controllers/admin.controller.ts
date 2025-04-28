@@ -31,12 +31,10 @@ export const deleteAUser = async (
 
     const userDeleted = await deleteUser(id)
     if(userDeleted){
-      res.sendStatus(204).json({message: "User Deleted"});
+      res.status(204).json({message: "User Deleted"});
     }else{
-      res.sendStatus(409).json({message: "User not found"})
+      res.status(409).json({message: "User not found"});
     }
-
-    res.sendStatus(204);
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.log(error.message)
