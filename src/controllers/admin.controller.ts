@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
 import User from '../database/models/User';
-import {
-  getAllUsers,
-  deleteUser,
-} from '../services/users.service';
+import { getAllUsers, deleteUser } from '../services/users.service';
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
+    const users = await getAllUsers();
     const users = await getAllUsers();
     res.json(users);
     console.log(users)
@@ -37,8 +35,11 @@ export const deleteAUser = async (
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.log(error.message)
-      res.status(500).json({ message: "Server erros, check server console for more info" });
+      console.log(error.message);
+      res
+        .status(500)
+        .json({ message: 'Server erros, check server console for more info' });
     }
   }
 };
+ 
