@@ -111,7 +111,7 @@ export const createAdmin = async (): Promise<void> => {
     const hashedPassword = bcrypt.hashSync('admin', 10);
 
     const newUser = await User.create({
-      name: 'admin',
+      username: 'admin',
       email: 'admin@admin.com',
       password: hashedPassword,
     });

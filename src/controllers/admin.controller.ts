@@ -5,7 +5,6 @@ import { getAllUsers, deleteUser } from '../services/users.service';
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await getAllUsers();
-    const users = await getAllUsers();
     res.json(users);
     console.log(users)
   } catch (error) {
