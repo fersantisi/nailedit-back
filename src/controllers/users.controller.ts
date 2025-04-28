@@ -14,7 +14,7 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
     const user = await getUserData(id);
     if (user != null) {
       //do stuff
-      res.status(201).json(User);
+      res.status(201).json(user);
     } else {
       res.status(400).json({ message: 'user not found' });
     }
