@@ -1,25 +1,21 @@
 import { Request, Response } from 'express';
 import { setAuthCookie, setRefreshCookie } from '../utils/cookie';
 import { logIn } from '../services/login.service';
-import {
-  createNewUser,
-} from '../services/users.service';
-import { LoginDto } from '../dtos/loginDto'
-import { validateLogin } from '../middlewares/validateLogin';
+import { createNewUser } from '../services/users.service';
+import { LoginDto } from '../dtos/loginDto';
+import { validateOrReject } from 'class-validator';
+import { UserDto } from '../dtos/UserDto';
 
 
 export const getLogin = async (req: Request, res: Response) => {
-  let login:LoginDto;
+  try {
 
-  try {
-    login = await validateLogin(req.body);
-  } catch (error) {
-    return res.status(400).json({error});
-  }
-  
-  
-  try {
-    const tokens = await logIn(login.name, login.password);
+    const { username, password } = req.body;
+    const login: LoginDto = new LoginDto(username, password)
+
+    await validateOrReject(logIn);
+
+    const tokens = await logIn(login.username, login.password);
     if (tokens === null) {
       res.status(409).json({ message: 'invalid credentials.' });
     } else if (tokens) {
@@ -34,9 +30,18 @@ export const getLogin = async (req: Request, res: Response) => {
     }
 
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.log(error);
-      res.status(500).json({ message: "Server error, check server console for more info." });
+    if (Array.isArray(error)) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: error.map(err => ({
+          property: err.property,
+          constraints: err.constraints
+        }))
+      });
+    } else if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
     }
   }
 };
@@ -47,20 +52,30 @@ export const createUser = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
-    //add data validation
-    if (await createNewUser(name, email, password)) {
+    const { username, email, password } = req.body;
+    
+    const user:UserDto = new UserDto(username, email, password)
+
+    await validateOrReject(user);
+
+    if (await createNewUser(username, email, password)) {
       res.status(201).json({ message: 'user Created' });
     } else {
       res.status(409).json({ message: 'Email alredy in use' });
     }
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.log(error.message);
-      res.status(500).json({
-        message:
-          'internal server error, check server console for more information',
+    if (Array.isArray(error)) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: error.map(err => ({
+          property: err.property,
+          constraints: err.constraints
+        }))
       });
+    } else if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
     }
   }
 };
