@@ -9,6 +9,8 @@ import {
 } from '../middlewares/validate-token';
 import { getUsers } from '../controllers/admin.controller';
 
+import projectRoutes from './project.routes';
+
 const router = Router();
 
 
