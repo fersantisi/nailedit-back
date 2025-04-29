@@ -1,43 +1,40 @@
 import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
-import { GoalDto } from '../dtos/GoalDto';
-import { createGoal, deleteGoal, getGoal } from '../services/goals.service';
-import { GoalDataDto } from '../dtos/GoalDataDto';
+import { TaskDto } from '../dtos/TaskDto';
+import { TaskDataDto } from '../dtos/TaskDataDto';
+import { createTask, deleteTask, gettask } from '../services/task.service';
 
-export const createNewGoal = async (
+
+export const createNewTask = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  console.log('createNewGoal');
   
   try {
-    const projectIdSTR = req.params.projectId
-    const projectIdNumber = +projectIdSTR
+    const goalIdSTR = req.params.goalId;
+    const goalIdNumber = +goalIdSTR;
 
-    const { name, description, dueDate } = req.body;
+    const { name, description, label, dueDate } = req.body;
 
 
-    const goal: GoalDto = new GoalDto(
+    const task: TaskDto = new TaskDto(
       name,
       description,
+      label,
       dueDate,
-      projectIdNumber,
-    );
+      goalIdNumber
+    );    
 
-    console.log(goal.duedate);
-    
+    await validateOrReject(task);
 
-    await validateOrReject(goal);
-
-    await createGoal(goal);
+    await createTask(task);
 
     res.status(201).json({
-      message: 'Goal created',
+      message: 'Task created',
     });
   } catch (error: unknown) {
     console.log(error);
     if (Array.isArray(error)) {
-      // Validation error from class-validator
       res.status(400).json({
         message: 'Validation failed',
         errors: error.map((err) => ({
@@ -53,16 +50,16 @@ export const createNewGoal = async (
   }
 };
 
-export const deleteAGoal = async (
+export const deleteATask = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-    const goalId = req.params.goalId;
-    console.log(goalId);
-    await deleteGoal(goalId);
+    const taskId = req.params.taskId;
+    console.log(taskId);
+    await deleteTask(taskId);
     res.status(200).json({
-      message: 'Goal deleted',
+      message: 'Task deleted',
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -71,15 +68,15 @@ export const deleteAGoal = async (
   }
 };
 
-export const getAGoal = async (
+export const getATask = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-    const goalId = req.params.goalId;
-    const goal: GoalDataDto = await getGoal(goalId);
+    const taskId = req.params.taskId;
+    const task: TaskDataDto = await gettask(taskId);
 
-    res.status(201).json(goal);
+    res.status(201).json(task);
   } catch (error) {
     if (error instanceof Error) {
       res.status(418).json({ message: error.message });
@@ -87,7 +84,7 @@ export const getAGoal = async (
   }
 };
 
-export const modifyAGoal = async (
+export const modifyATask = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
