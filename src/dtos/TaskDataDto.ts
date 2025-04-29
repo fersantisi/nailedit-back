@@ -9,8 +9,6 @@ import {
 
 export class TaskDataDto {
 
-  @IsNumber()
-  declare id: number;
 
   @IsString()
   @IsNotEmpty({ message: 'Name is requiered' })
@@ -38,7 +36,6 @@ export class TaskDataDto {
   declare updatedDate: Date;
 
   constructor(
-    id: number,
     name: string,
     description: string,
     label: string,
@@ -46,7 +43,7 @@ export class TaskDataDto {
     creationDate: Date,
     updatedDate: Date,
   ) {
-    this.id = id;
+   
     this.name = name;
     this.description = description;
     this.label = label;

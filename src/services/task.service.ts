@@ -1,40 +1,44 @@
+import Task from "../database/models/Task";
+import { TaskDataDto } from "../dtos/TaskDataDto";
+import { TaskDto } from "../dtos/TaskDto";
 
 
-export const createGoal = async (goal: GoalDto) => {
+export const createTask = async (task: TaskDto) => {
 
   try {
-    const existingGoal = await Goal.findOne({
-      where: { name: goal.name },
+    const existingTask = await Task.findOne({
+      where: { name: task.name },
     });
   
-    if (existingGoal) {
-      throw new Error('Goal name already in use.');
+    if (existingTask) {
+      throw new Error('task name already in use.');
     }
   
-    const newGoal = await Goal.create({
-      name: goal.name,
-      description: goal.description,
-      duedate: goal.duedate,
-      projectid: goal.projectId,
+    const newTask = await Task.create({
+      name: task.name,
+      description: task.description,
+      label: task.label,
+      duedate: task.duedate,
+      projectid: task.goalId,
     });
-    console.log(newGoal);
+    
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
-      throw new Error('Goal name already in use.');
+      throw new Error('Task name already in use.');
     }
   }
   
 };
 
-export const deleteGoal = async (goalId: string) => {
+export const deleteTask = async (taskId: string) => {
   try {
-    const goal = await Goal.findByPk(goalId);
-    if (!goal) {
-      throw new Error('Goal not found');
+    const task = await Task.findByPk(taskId);
+    if (!task) {
+      throw new Error('Task not found');
     }
 
-    await goal.destroy();
+    await Task.destroy();
 
   } catch (error) {
     if (error instanceof Error) {
@@ -43,24 +47,25 @@ export const deleteGoal = async (goalId: string) => {
   }
 };
 
-export const getGoal = async (
-  goalId: string,
-): Promise<GoalDataDto> => {
+export const gettask = async (
+  taskId: string,
+): Promise<TaskDataDto> => {
   try {
-    const goal = await Goal.findByPk(goalId);
-    if (!goal) {
-      throw new Error('Goal not found');
+    const task = await Task.findByPk(taskId);
+    if (!task) {
+      throw new Error('task not found');
     }
 
-    const goalDto: GoalDataDto = new GoalDataDto(
-      goal.name,
-      goal.description,
-      goal.duedate,
-      goal.created_at,
-      goal.updated_at,
+    const taskDto: TaskDataDto = new TaskDataDto(
+      task.name,
+      task.description,
+      task.label,
+      task.duedate,
+      task.created_at,
+      task.updated_at,
     );
 
-    return goalDto
+    return taskDto
 
   } catch (error) {
     if (error instanceof Error) {
