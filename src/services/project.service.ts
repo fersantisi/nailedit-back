@@ -57,6 +57,7 @@ export const getProject = async (
     }
 
     const projectDTO: ProjectDataDto = new ProjectDataDto(
+      project.id,
       project.name,
       project.description,
       project.category,
@@ -86,6 +87,7 @@ export const getProjectsByUserIdService = async (
 
     const projectDTOs: ProjectDataDto[] = projects.map((project) => {
       return new ProjectDataDto(
+        project.id,
         project.name,
         project.description,
         project.category,

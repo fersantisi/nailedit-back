@@ -9,6 +9,7 @@ import {
 } from '../services/project.service';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
 import { validateOrReject } from 'class-validator';
+import { log } from 'console';
 
 export const createNewProject = async (
   req: Request,
@@ -105,6 +106,8 @@ export const getProjectsByUserId = async (
   try {
     const userId = await getTokenPayload(req.cookies.authToken).userId;
     const projects: ProjectDataDto[] = await getProjectsByUserIdService(userId);
+    console.log(projects);
+    
     res.status(200).json(projects);
   } catch (error) {
     if (error instanceof Error) {

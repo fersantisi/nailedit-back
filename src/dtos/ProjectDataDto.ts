@@ -9,6 +9,9 @@ import {
 } from 'class-validator';
 
 export class ProjectDataDto {
+  @IsNumber()
+  declare id: number;
+
   @IsString()
   @IsNotEmpty({ message: 'Name is requiered' })
   declare name: string;
@@ -38,6 +41,7 @@ export class ProjectDataDto {
   declare updatedDate: Date;
 
   constructor(
+    id: number,
     name: string,
     description: string,
     category: string,
@@ -46,6 +50,7 @@ export class ProjectDataDto {
     creationDate: Date,
     updatedDate: Date,
   ) {
+    this.id = id;
     this.name = name;
     this.description = description;
     this.category = category;

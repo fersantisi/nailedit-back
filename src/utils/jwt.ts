@@ -24,7 +24,7 @@ export const tokenGenerator = (user:User):{authToken: string, refreshToken: stri
         authToken = jwt.sign({
             name: user.username,
             userId: user.id,
-        }, process.env.SECRET_KEY || "123",{ expiresIn: "5s" })
+        }, process.env.SECRET_KEY || "123",{ expiresIn: "15m" })
 
         refreshToken = jwt.sign({
             refresh: true
