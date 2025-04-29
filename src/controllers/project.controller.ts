@@ -6,10 +6,11 @@ import {
   deleteProject,
   getProject,
   getProjectsByUserIdService,
+  updateProject,
 } from '../services/project.service';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
 import { validateOrReject } from 'class-validator';
-import { log } from 'console';
+import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 
 export const createNewProject = async (
   req: Request,
@@ -44,7 +45,6 @@ export const createNewProject = async (
   } catch (error: unknown) {
     console.log(error);
     if (Array.isArray(error)) {
-      // Validation error from class-validator
       res.status(400).json({
         message: 'Validation failed',
         errors: error.map((err) => ({
@@ -94,11 +94,6 @@ export const getAProject = async (
   }
 };
 
-export const modifyAProject = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {};
-
 export const getProjectsByUserId = async (
   req: Request,
   res: Response,
@@ -115,3 +110,43 @@ export const getProjectsByUserId = async (
     }
   }
 };
+
+export const updateAProject = async(req: Request, res: Response):Promise<void>=> {
+  try{
+    const { name, description, category, image, dueDate } = req.body;
+    const projectIdStr = req.params.projectId;
+    const projectIdNumber = +projectIdStr;
+
+    const project: UpdateProjectDto = new UpdateProjectDto(
+      name,
+      description,
+      category,
+      image,
+      dueDate,
+      projectIdNumber,
+    );
+
+    await validateOrReject(project);
+
+    await updateProject(project);
+
+    res.status(201).json({
+      message: 'Project created',
+    });
+  } catch (error: unknown) {
+    console.log(error);
+    if (Array.isArray(error)) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: error.map((err) => ({
+          property: err.property,
+          constraints: err.constraints,
+        })),
+      });
+    } else if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    } 
+  }
+}

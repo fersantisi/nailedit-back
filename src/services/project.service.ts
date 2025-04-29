@@ -2,6 +2,7 @@ import { error } from 'console';
 import Project from '../database/models/Project';
 import { ProjectDto } from '../dtos/ProjectDto';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
+import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 
 export const createProject = async (project: ProjectDto) => {
 
@@ -107,5 +108,17 @@ export const getProjectsByUserIdService = async (
   }
 };
 
+export const updateProject = async(newData:UpdateProjectDto)=>{ 
+  const project = await Project.findByPk(newData.projectId);
 
-//export const modifyProject = async(projectId: ProjectDto)
+  if (!project) {
+    throw error("Project not found");
+  }
+  project.name = newData.name;
+  project.description = newData.description
+  project.category = newData.category
+  project.image =  newData.image
+  project.duedate = newData.duedate
+  await project.save();
+}
+

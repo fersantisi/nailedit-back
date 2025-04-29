@@ -2,13 +2,9 @@ import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { TaskDto } from '../dtos/TaskDto';
 import { TaskDataDto } from '../dtos/TaskDataDto';
-import {
-  createTask,
-  deleteTask,
-  gettask,
-  getTaskByGoalIdService,
-} from '../services/task.service';
-import { log } from 'console';
+import { createTask, deleteTask, gettask, getTaskByGoalIdService, updateTask} from '../services/task.service';
+import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
+
 
 export const createNewTask = async (
   req: Request,
@@ -111,3 +107,42 @@ export const getTasksByGoalId = async (
     }
   }
 };
+
+export const updateATask = async(req: Request, res: Response):Promise<void>=> {
+  try{
+    const { name, description, category, dueDate } = req.body;
+    const taskIdStr = req.params.taskId;
+    const taskIdNumber = +taskIdStr;
+
+    const task: UpdateTaskDto = new UpdateTaskDto(
+      name,
+      description,
+      category,
+      dueDate,
+      taskIdNumber,
+    );
+
+    await validateOrReject(task);
+
+    await updateTask(task);
+
+    res.status(201).json({
+      message: 'Task created',
+    });
+  } catch (error: unknown) {
+    console.log(error);
+    if (Array.isArray(error)) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: error.map((err) => ({
+          property: err.property,
+          constraints: err.constraints,
+        })),
+      });
+    } else if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    } 
+  }
+}

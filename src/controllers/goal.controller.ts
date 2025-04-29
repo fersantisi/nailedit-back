@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { GoalDto } from '../dtos/GoalDto';
-import { createGoal, deleteGoal, getGoal, getGoalsByPRojectIdService } from '../services/goals.service';
+import { createGoal, deleteGoal, getGoal, getGoalsByProjectIdService, updateGoal} from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
+import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
 
 export const createNewGoal = async (
   req: Request,
@@ -11,8 +12,8 @@ export const createNewGoal = async (
   console.log('createNewGoal');
   
   try {
-    const projectIdSTR = req.params.projectId
-    const projectIdNumber = +projectIdSTR
+    const goalIdSTR = req.params.goalId
+    const goalIdNumber = +goalIdSTR
 
     const { name, description, dueDate } = req.body;
 
@@ -21,7 +22,7 @@ export const createNewGoal = async (
       name,
       description,
       dueDate,
-      projectIdNumber,
+      goalIdNumber,
     );
 
     console.log(goal.duedate);
@@ -87,13 +88,6 @@ export const getAGoal = async (
   }
 };
 
-export const modifyAGoal = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  
-};
-
 export const getGoalsByProjectId = async (
   req: Request,
   res: Response,
@@ -104,12 +98,51 @@ export const getGoalsByProjectId = async (
     const projectIdStr = req.params.projectId;
     const projectIdNumber = +projectIdStr;
 
-    const goals: GoalDataDto[] = await getGoalsByPRojectIdService(projectIdNumber);
+    const goals: GoalDataDto[] = await getGoalsByProjectIdService(goalIdNumber);
     
     res.status(200).json(goals);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(400).json({ message: error.message });
+      res.status(418).json({ message: error.message });
     }
   }
 };
+
+export const updateAGoal = async(req: Request, res: Response):Promise<void>=> {
+  try{
+    const { name, description, category, image, dueDate } = req.body;
+    const goalIdStr = req.params.goalId;
+    const goalIdNumber = +goalIdStr;
+
+    const goal: UpdateGoalDto = new UpdateGoalDto(
+      name,
+      description,
+      dueDate,
+      goalIdNumber,
+    );
+
+    await validateOrReject(goal);
+
+    await updateGoal(goal);
+
+    res.status(201).json({
+      message: 'Goal updated',
+    });
+  } catch (error: unknown) {
+    console.log(error);
+    if (Array.isArray(error)) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: error.map((err) => ({
+          property: err.property,
+          constraints: err.constraints,
+        })),
+      });
+    } else if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    } 
+  }
+}
+

@@ -1,6 +1,8 @@
 import Task from "../database/models/Task";
 import { TaskDataDto } from "../dtos/TaskDataDto";
 import { TaskDto } from "../dtos/TaskDto";
+import { UpdateProjectDto } from "../dtos/UpdateProjectDto";
+import { UpdateTaskDto } from "../dtos/UpdateTaskDto";
 
 
 export const createTask = async (task: TaskDto) => {
@@ -111,3 +113,21 @@ export const getTaskByGoalIdService = async (
     throw new Error('Server error, check server console for more information');
   }
 };
+
+export const updateTask = async(newData:UpdateTaskDto)=>{ 
+
+  const task = await Task.findByPk(newData.taskId);
+  
+  if (!task) {
+    throw Error("task not found");
+  }
+
+  task.name = newData.name;
+  task.description = newData.description
+  task.label  = newData.label
+  task.duedate = newData.duedate
+  await task.save();
+}
+
+
+
