@@ -98,7 +98,9 @@ export const getGoalsByProjectId = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
+  console.log('getGoalsByProjectIdfbjsdafbnsjkafnskdfnbsjdafbhsafs;abf;kjsdbfjsdbfk;jbfjaksfbsjkabfsk;ajbfsjfbsfsa', req.params.projectId);
   try {
+    
     const projectIdStr = req.params.projectId;
     const projectIdNumber = +projectIdStr;
 
@@ -107,7 +109,7 @@ export const getGoalsByProjectId = async (
     res.status(200).json(goals);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   }
 };

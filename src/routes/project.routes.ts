@@ -15,14 +15,14 @@ router.put('/update', )
 router.get('/list', getProjectsByUserId);
 
 router.post('/:projectId/createGoal', createNewGoal )
-router.delete('/:projectId/:goalId', deleteAGoal)
-router.get('/:projectId/:goalId',getAGoal)
-router.get('/:projectId/list', getGoalsByProjectId);
+router.delete('/:projectId/goal/:goalId', deleteAGoal)
+router.get('/:projectId/goal/:goalId',getAGoal)
+router.get('/:projectId/goal/list', getGoalsByProjectId);
 
-router.post('/:projectId/:goalId/createTask', createNewTask)
-router.get('/:projectId/:goalId/:taskId', getATask)
-router.delete('/:projectId/:goalId/:taskId', deleteATask)
-router.get('/:projectId/:goalId/list', getTasksByGoalId);
+router.post('/:projectId/goal/:goalId/createTask', createNewTask)
+router.get('/:projectId/goal/:goalId/task/:taskId', getATask)
+router.delete('/:projectId/goal/:goalId/task/:taskId', deleteATask)
+router.get('/:projectId/goal/:goalId/task/list', getTasksByGoalId);
 
 
 export default router;
