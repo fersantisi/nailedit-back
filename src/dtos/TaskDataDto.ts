@@ -12,6 +12,9 @@ export class TaskDataDto {
   @IsNumber()
   declare id: number;
 
+  @IsNumber()
+  declare goalid: number;
+
   @IsString()
   @IsNotEmpty({ message: 'Name is requiered' })
   declare name: string;
@@ -39,6 +42,7 @@ export class TaskDataDto {
 
   constructor(
     taskId: number,
+    goalId: number,
     name: string,
     description: string,
     label: string,
@@ -47,6 +51,7 @@ export class TaskDataDto {
     updatedDate: Date,
   ) {
     this.id = taskId;
+    this.goalid = goalId;
     this.name = name;
     this.description = description;
     this.label = label;

@@ -19,7 +19,7 @@ export const createTask = async (task: TaskDto) => {
       description: task.description,
       label: task.label,
       duedate: task.duedate,
-      projectid: task.goalId,
+      goalid: task.goalId,
     });
     
   } catch (error) {
@@ -38,7 +38,7 @@ export const deleteTask = async (taskId: string) => {
       throw new Error('Task not found');
     }
 
-    await Task.destroy();
+    await task.destroy();
 
   } catch (error) {
     if (error instanceof Error) {
@@ -58,6 +58,7 @@ export const gettask = async (
 
     const taskDto: TaskDataDto = new TaskDataDto(
       task.id,
+      task.goalid,
       task.name,
       task.description,
       task.label,
@@ -77,16 +78,22 @@ export const gettask = async (
 };
 
 export const getTaskByGoalIdService = async (
-  projectId: number,
+  goalId: number,
 ): Promise<TaskDataDto[]> => {
   try {
+    
+    if (isNaN(goalId)) {
+      throw new Error('Invalid goalId: must be a valid number');
+    }
+
     const tasks = await Task.findAll({
-      where: { projectid: projectId },
+      where: { goalid: goalId },
     });
 
     const taskDTOs: TaskDataDto[] = tasks.map((task) => {
       return new TaskDataDto(
         task.id,
+        task.goalid,
         task.name,
         task.description,
         task.label,

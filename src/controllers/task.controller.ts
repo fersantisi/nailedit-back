@@ -2,28 +2,35 @@ import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { TaskDto } from '../dtos/TaskDto';
 import { TaskDataDto } from '../dtos/TaskDataDto';
-import { createTask, deleteTask, gettask, getTaskByGoalIdService } from '../services/task.service';
-
+import {
+  createTask,
+  deleteTask,
+  gettask,
+  getTaskByGoalIdService,
+} from '../services/task.service';
+import { log } from 'console';
 
 export const createNewTask = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  
   try {
     const goalIdSTR = req.params.goalId;
     const goalIdNumber = +goalIdSTR;
+    
 
     const { name, description, label, dueDate } = req.body;
-
+    
+    console.log(dueDate);
+    
 
     const task: TaskDto = new TaskDto(
       name,
       description,
       label,
       dueDate,
-      goalIdNumber
-    );    
+      goalIdNumber,
+    );
 
     await validateOrReject(task);
 
@@ -68,10 +75,7 @@ export const deleteATask = async (
   }
 };
 
-export const getATask = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const getATask = async (req: Request, res: Response): Promise<void> => {
   try {
     const taskId = req.params.taskId;
     const task: TaskDataDto = await gettask(taskId);
@@ -87,19 +91,18 @@ export const getATask = async (
 export const modifyATask = async (
   req: Request,
   res: Response,
-): Promise<void> => {
-  
-};
+): Promise<void> => {};
 
 export const getTasksByGoalId = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-    const goalIdStr = req.params.goaltId;
+    const goalIdStr = req.params.goalId;
     const goalIdNumber = +goalIdStr;
 
     const tasks: TaskDataDto[] = await getTaskByGoalIdService(goalIdNumber);
+    console.log(tasks);
     
     res.status(200).json(tasks);
   } catch (error) {
