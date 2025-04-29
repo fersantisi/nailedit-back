@@ -20,6 +20,7 @@ export const validateToken = (
         authToken,
         process.env.SECRET_KEY || '123',
       );
+      console.log("dance")
       next();
     } catch (error) {
       if (refreshSession(authToken, refreshToken, req, res)) {
@@ -68,7 +69,7 @@ function refreshSession(
       );
       const payload =getTokenPayload(token);
       const { iat, exp, ...cleanPayload } = payload;
-      const newToken = regenerateToken({ name: cleanPayload.name });
+      const newToken = regenerateToken({ name: cleanPayload.name, userId: cleanPayload.userId });
 
       res.status(200).cookie('authToken', newToken, {
         maxAge: 1000 * 60 * 15,

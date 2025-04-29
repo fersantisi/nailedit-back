@@ -35,7 +35,7 @@ export const tokenGenerator = (user:User):{authToken: string, refreshToken: stri
     return {authToken,refreshToken}
 }
 
-export const regenerateToken = (payload:{name:string,admin?:boolean}): string =>{
+export const regenerateToken = (payload:{name:string,userId: number,admin?:boolean}): string =>{
 
     let authToken: string;
 
