@@ -12,7 +12,7 @@ router.post('/create', createNewProject);
 router.delete('/delete/:id', deleteAProject);
 router.put('/update', )
 router.get('/list', getProjectsByUserId);
-router.post('/projectId/createGoal', createNewGoal )
-router.delete('/projectId/:goalId', deleteAProject)
+router.post('/:projectId/createGoal', createNewGoal )
+router.delete('/:projectId/:goalId', deleteAProject)
 
 export default router;

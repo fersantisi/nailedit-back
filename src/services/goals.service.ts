@@ -16,8 +16,8 @@ export const createGoal = async (goal: GoalDto) => {
     const newGoal = await Goal.create({
       name: goal.name,
       description: goal.description,
-      dueDate: goal.duedate,
-      userid: goal.userId,
+      duedate: goal.duedate,
+      projectid: goal.projectId,
     });
     console.log(newGoal);
   } catch (error) {

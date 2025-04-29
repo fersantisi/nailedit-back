@@ -24,7 +24,7 @@ export class GoalDataDto {
   declare creationDate: Date;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   declare updatedDate: Date;
 
   constructor(

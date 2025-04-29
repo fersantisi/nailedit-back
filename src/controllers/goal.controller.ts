@@ -8,11 +8,14 @@ export const createNewGoal = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
+  console.log('createNewGoal');
+  
   try {
     const projectIdSTR = req.params.projectId
     const projectIdNumber = +projectIdSTR
 
     const { name, description, dueDate } = req.body;
+
 
     const goal: GoalDto = new GoalDto(
       name,
@@ -21,6 +24,8 @@ export const createNewGoal = async (
       projectIdNumber,
     );
 
+    console.log(goal.duedate);
+    
 
     await validateOrReject(goal);
 

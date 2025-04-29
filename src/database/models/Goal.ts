@@ -19,7 +19,7 @@ class Goal extends Model {
   @Column({
     type: DataType.INTEGER,
   })
-  declare userid: number;
+  declare projectid: number;
 
   @Column({
     type: DataType.STRING,

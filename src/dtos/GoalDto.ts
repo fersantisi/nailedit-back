@@ -1,5 +1,6 @@
 import {
-    IsDate,
+  IsDate,
+  IsDateString,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -7,30 +8,31 @@ import {
 } from 'class-validator';
 
 export class GoalDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Name is requiered' })
+  declare name: string;
 
-    @IsString()
-    @IsNotEmpty({message: "Name is requiered"})
-    declare name: string;
+  @IsOptional()
+  @IsString()
+  declare description: string;
 
-    @IsOptional()
-    @IsString()
-    declare description: string;
+  @IsOptional()
+  @IsDateString()
+  declare duedate: string;
 
-    @IsOptional()
-    @IsDate()
-    declare duedate: string;
+  @IsNotEmpty()
+  @IsNumber()
+  declare projectId: number;
 
-    @IsNotEmpty()
-    @IsNumber()
-    declare userId: number;
-
-
-    constructor(name:string, description: string, duedate:string, userId:number){
-        
-        
-        this.name = name;
-        this.description = description;
-        this.duedate = duedate;
-        this.userId = userId
-    }
+  constructor(
+    name: string,
+    description: string,
+    duedate: string,
+    userId: number,
+  ) {
+    this.name = name;
+    this.description = description;
+    this.duedate = duedate;
+    this.projectId = userId;
+  }
 }
