@@ -134,3 +134,30 @@ export const verifyEmail = async (email:string): Promise<boolean> =>{
     throw error;
   }
 }
+
+export const passwordRecovery = async(token:string, password: string):Promise<void> =>{
+  
+  try {
+      const payload = await jwt.verify(token, process.env.PASSWORD_RECOVERY_KEY || '123') as JwtPayload;
+
+      const{email, ...rest} = payload
+
+      console.log(email)
+
+      const user = await User.findOne({where: {email: email}})
+
+      if (!user) {
+        throw new Error("User not Found");
+      }
+
+      const hashedPassword = bcrypt.hashSync(password, 10);
+
+      user.password = hashedPassword;
+
+      await user.save()
+
+  } catch (error) {
+    throw error;
+  }
+
+}

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { setAuthCookie, setRefreshCookie } from '../utils/cookie';
 import { logIn } from '../services/login.service';
-import { createNewUser ,verifyEmail } from '../services/users.service';
+import { createNewUser ,verifyEmail, passwordRecovery } from '../services/users.service';
 import { LoginDto } from '../dtos/loginDto';
 import { validateOrReject } from 'class-validator';
 import { UserDto } from '../dtos/UserDto';
@@ -89,19 +89,33 @@ export const forgotPassword = async (
   
   if(!email){res.status(500).json({message: "Missing mail."})}
 
+ try {
   let link:string;
-
   if(await verifyEmail(email)){
     link = generateRecoveryLink(email)
   }else{
     link = "Bad email"
   }
-
-  
   res.status(200).json({message: `Mail enviado. Por conveniencia de la materia, este es el link: ${link}`})
-
+ } catch (error) {
+  if (error instanceof Error) {
+    res.status(500).json({ message: error.message });
+  } else {
+    res.status(500).json({ message: 'Unknown error' });
+  }
+ }
 };
 
 export const recoverPassword = async(req: Request,res: Response): Promise<void>=>{
   const recoveryJwt = req.params.jwt
+  const newPassword = req.body.password;
+  try {
+  await passwordRecovery(recoveryJwt,newPassword);
+  res.status(200).json({message: "Password Changed"})
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log({ message: error.message })
+      res.status(500).json({message: "Server ERROR. Check server logs for more information."});
+    }
+  }
 }
