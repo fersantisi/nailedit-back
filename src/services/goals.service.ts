@@ -1,6 +1,7 @@
 import Goal from '../database/models/Goal'
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { GoalDto } from '../dtos/GoalDto';
+import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
 
 export const createGoal = async (goal: GoalDto) => {
 
@@ -101,33 +102,14 @@ export const getGoalsByProjectIdService = async (
   }
 };
 
-export const updateGoalName = async(name:string, projectId: number)=>{ 
-  const goal = await Goal.findByPk(projectId);
+export const updateGoal = async(newData:UpdateGoalDto)=>{ 
+  const goal = await Goal.findByPk(newData.goalId);
+
   if (!goal) {
     throw Error("Project not found");
   }
-
-  goal.name = name;
-
-  await goal.save();
-}
-
-export const updateGoalDescription = async(description:string, projectId: number)=>{ 
-  const goal = await Goal.findByPk(projectId);
-  if (!goal) {
-    throw Error("Project not found");
-  }
-
-  goal.description = description;
-  await goal.save();
-}
-
-export const updateGoalDuedate = async(dueDate:string, projectId: number)=>{ 
-  const goal = await Goal.findByPk(projectId);
-  if (!goal) {
-    throw Error("Project not found");
-  }
-
-  goal.duedate = dueDate;
+  goal.name = newData.name;
+  goal.description = newData.description
+  goal.duedate = newData.duedate
   await goal.save();
 }

@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { GoalDto } from '../dtos/GoalDto';
-import { createGoal, deleteGoal, getGoal, getGoalsByProjectIdService, updateGoalDescription, updateGoalDuedate, updateGoalName } from '../services/goals.service';
+import { createGoal, deleteGoal, getGoal, getGoalsByProjectIdService, updateGoal} from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
+import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
 
 export const createNewGoal = async (
   req: Request,
@@ -105,59 +106,41 @@ export const getGoalsByProjectId = async (
   }
 };
 
-export const updateAGoalName = async(req: Request, res: Response):Promise<void>=> {
-  const name = req.body.name;
-  const goalIdStr = req.params.goalId;
-  const goalIdNumber = +goalIdStr;
-  if(!name){
-    res.status(400).json({message: "Invalid Name."})
-  }
+export const updateAGoal = async(req: Request, res: Response):Promise<void>=> {
+  try{
+    const { name, description, category, image, dueDate } = req.body;
+    const goalIdStr = req.params.goalId;
+    const goalIdNumber = +goalIdStr;
 
-  try {
-    updateGoalName(name, goalIdNumber);
-    res.status(200).json({message: "Name changed succesfully"})
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
-    }
-  }
-  
+    const goal: UpdateGoalDto = new UpdateGoalDto(
+      name,
+      description,
+      dueDate,
+      goalIdNumber,
+    );
 
-}
+    await validateOrReject(goal);
 
-export const updateAGoalDescription = async(req: Request, res: Response):Promise<void>=> {
+    await updateGoal(goal);
 
-  const description = req.body.description;
-  const goalIdStr = req.params.goalId;
-  const goalIdNumber = +goalIdStr;
-  if(!description){
-    res.status(400).json({message: "Invalid description."})
-  }
-
-  try {
-    updateGoalDescription(description, goalIdNumber);
-    res.status(200).json({message: "Description changed succesfully"})
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
-    }
-  }
-}
-
-export const updateAGoalDuedate = async(req: Request, res: Response):Promise<void>=> {
-  const duedate = req.body.image;
-  const goalIdStr = req.params.goalId;
-  const goalIdNumber = +goalIdStr;
-  if(!duedate){
-    res.status(400).json({message: "Invalid Image."})
-  }
-
-  try {
-    updateGoalDuedate(duedate , goalIdNumber);
-    res.status(200).json({message: "Inmage changed succesfully"})
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
-    }
+    res.status(201).json({
+      message: 'Goal updated',
+    });
+  } catch (error: unknown) {
+    console.log(error);
+    if (Array.isArray(error)) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: error.map((err) => ({
+          property: err.property,
+          constraints: err.constraints,
+        })),
+      });
+    } else if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    } 
   }
 }
+

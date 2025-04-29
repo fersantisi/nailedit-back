@@ -2,6 +2,7 @@ import { error } from 'console';
 import Project from '../database/models/Project';
 import { ProjectDto } from '../dtos/ProjectDto';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
+import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 
 export const createProject = async (project: ProjectDto) => {
 
@@ -107,52 +108,17 @@ export const getProjectsByUserIdService = async (
   }
 };
 
-export const updateProjectName = async(name:string, projectId: number)=>{ 
-  const project = await Project.findByPk(projectId);
+export const updateProject = async(newData:UpdateProjectDto)=>{ 
+  const project = await Project.findByPk(newData.projectId);
+
   if (!project) {
     throw error("Project not found");
   }
-
-  project.name = name;
-
+  project.name = newData.name;
+  project.description = newData.description
+  project.category = newData.category
+  project.image =  newData.image
+  project.duedate = newData.duedate
   await project.save();
 }
 
-export const updateProjectDescription = async(description:string, projectId: number)=>{ 
-  const project = await Project.findByPk(projectId);
-  if (!project) {
-    throw error("Project not found");
-  }
-
-  project.description = description;
-
-  await project.save();
-}
-export const updateProjectCategory = async(category:string, projectId: number)=>{ 
-  const project = await Project.findByPk(projectId);
-  if (!project) {
-    throw error("Project not found");
-  }
-
-  project.category = category;
-
-  await project.save();
-}
-export const updateProjectImage = async(image:string, projectId: number)=>{ 
-  const project = await Project.findByPk(projectId);
-  if (!project) {
-    throw error("Project not found");
-  }
-  project.image = image;
-  await project.save();
-}
-export const updateProjectDuedate = async(dueDate: string, projectId: number)=>{ 
-  const project = await Project.findByPk(projectId);
-  if (!project) {
-    throw error("Project not found");
-  }
-
-  project.duedate = dueDate;
-
-  await project.save();
-}

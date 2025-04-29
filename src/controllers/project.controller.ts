@@ -6,15 +6,11 @@ import {
   deleteProject,
   getProject,
   getProjectsByUserIdService,
-  updateProjectCategory,
-  updateProjectDescription,
-  updateProjectDuedate,
-  updateProjectImage,
-  updateProjectName,
+  updateProject,
 } from '../services/project.service';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
 import { validateOrReject } from 'class-validator';
-import { log } from 'console';
+import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 
 export const createNewProject = async (
   req: Request,
@@ -49,7 +45,6 @@ export const createNewProject = async (
   } catch (error: unknown) {
     console.log(error);
     if (Array.isArray(error)) {
-      // Validation error from class-validator
       res.status(400).json({
         message: 'Validation failed',
         errors: error.map((err) => ({
@@ -116,91 +111,42 @@ export const getProjectsByUserId = async (
   }
 };
 
-export const updateAProjectName = async(req: Request, res: Response):Promise<void>=> {
-  const name = req.body.name;
-  const projectIdStr = req.params.projectId;
-  const projectIdNumber = +projectIdStr;
-  if(!name){
-    res.status(400).json({message: "Invalid Name."})
-  }
+export const updateAProject = async(req: Request, res: Response):Promise<void>=> {
+  try{
+    const { name, description, category, image, dueDate } = req.body;
+    const projectIdStr = req.params.projectId;
+    const projectIdNumber = +projectIdStr;
 
-  try {
-    updateProjectName(name, projectIdNumber);
-    res.status(200).json({message: "Name changed succesfully"})
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
-    }
-  }
-  
+    const project: UpdateProjectDto = new UpdateProjectDto(
+      name,
+      description,
+      category,
+      image,
+      dueDate,
+      projectIdNumber,
+    );
 
-}
-export const updateAProjectDescription = async(req: Request, res: Response):Promise<void>=> {
+    await validateOrReject(project);
 
-  const description = req.body.description;
-  const projectIdStr = req.params.projectId;
-  const projectIdNumber = +projectIdStr;
-  if(!description){
-    res.status(400).json({message: "Invalid description."})
-  }
+    await updateProject(project);
 
-  try {
-    updateProjectDescription(description, projectIdNumber);
-    res.status(200).json({message: "Description changed succesfully"})
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
-    }
-  }
-}
-export const updateAProjectCategory = async(req: Request, res: Response):Promise<void>=> {
-  const category = req.body.category;
-  const projectIdStr = req.params.projectId;
-  const projectIdNumber = +projectIdStr;
-  if(!category){
-    res.status(400).json({message: "Invalid Category."})
-  }
-
-  try {
-    updateProjectCategory(category, projectIdNumber);
-    res.status(200).json({message: "Name changed succesfully"})
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
-    }
-  }
-}
-export const updateAProjectImage = async(req: Request, res: Response):Promise<void>=> {
-  const image = req.body.image;
-  const projectIdStr = req.params.projectId;
-  const projectIdNumber = +projectIdStr;
-  if(!image){
-    res.status(400).json({message: "Invalid Image."})
-  }
-
-  try {
-    updateProjectImage(image, projectIdNumber);
-    res.status(200).json({message: "Inmage changed succesfully"})
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
-    }
-  }
-}
-export const updateAProjectDuedate = async(req: Request, res: Response):Promise<void>=> {
-  const duedate = req.body.image;
-  const projectIdStr = req.params.projectId;
-  const projectIdNumber = +projectIdStr;
-  if(!duedate){
-    res.status(400).json({message: "Invalid Image."})
-  }
-
-  try {
-    updateProjectDuedate(duedate , projectIdNumber);
-    res.status(200).json({message: "Inmage changed succesfully"})
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
-    }
+    res.status(201).json({
+      message: 'Project created',
+    });
+  } catch (error: unknown) {
+    console.log(error);
+    if (Array.isArray(error)) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: error.map((err) => ({
+          property: err.property,
+          constraints: err.constraints,
+        })),
+      });
+    } else if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    } 
   }
 }
