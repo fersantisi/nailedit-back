@@ -54,8 +54,14 @@ export const createUser = async (
 ): Promise<void> => {
   try {
     const { username, email, password } = req.body;
+
+    console.log({ username, email, password });
+    
     
     const user:UserDto = new UserDto(username, email, password)
+
+    console.log(user);
+    
 
     await validateOrReject(user);
 
@@ -96,7 +102,7 @@ export const forgotPassword = async (
   }else{
     link = "Bad email"
   }
-  res.status(200).json({message: `Mail enviado. Por conveniencia de la materia, este es el link: ${link}`})
+  res.status(200).json({message: `Mail enviado. Por conveniencia de la materia, este es el link: ${link}`, link});
  } catch (error) {
   if (error instanceof Error) {
     res.status(500).json({ message: error.message });
@@ -119,3 +125,15 @@ export const recoverPassword = async(req: Request,res: Response): Promise<void>=
     }
   }
 }
+
+export const logout = async (req: Request, res: Response): Promise<void> => {
+  try {
+    res.clearCookie('authToken');
+    res.clearCookie('refreshToken');
+    console.log('Logout successful');
+    
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
