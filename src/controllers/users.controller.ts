@@ -6,6 +6,7 @@ import {
   updateUserPassword,
 } from '../services/users.service';
 import { verify } from 'crypto';
+import jwt from 'jsonwebtoken';
 
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
@@ -50,4 +51,18 @@ export const updateUser = async (
   }
 };
 
+export const loggedIn = async (req: Request, res: Response): Promise<void> => {
+  const authToken = req.cookies.authToken;
+  const refreshToken = req.cookies.refreshToken;
 
+  if (!authToken || !refreshToken) {
+    res.status(401).json({ message: 'Not logged in' });
+  }
+
+  try {
+    const userData = jwt.verify(authToken, process.env.SECRET_KEY || '123');
+    res.status(200).json(userData);
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+};

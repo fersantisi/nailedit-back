@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   updateUser,
   getUser,
+  loggedIn,
 } from '../controllers/users.controller';
 import {
   validateToken,
@@ -16,5 +17,6 @@ const router = Router();
 
 router.put('/:id', updateUser);
 router.get('/profile/:id', getUser);
+router.get('/me', loggedIn);
 
 export default router;
