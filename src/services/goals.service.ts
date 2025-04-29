@@ -55,6 +55,7 @@ export const getGoal = async (
     }
 
     const goalDto: GoalDataDto = new GoalDataDto(
+      goal.id,
       goal.name,
       goal.description,
       goal.duedate,
@@ -69,6 +70,34 @@ export const getGoal = async (
       console.log(error);
     }
     throw new Error("Server error, check server console for more information")
+  }
+};
+
+export const getGoalsByPRojectIdService = async (
+  projectId: number,
+): Promise<GoalDataDto[]> => {
+  try {
+    const goals = await Goal.findAll({
+      where: { projectid: projectId },
+    });
+
+    const goalDTOs: GoalDataDto[] = goals.map((goal) => {
+      return new GoalDataDto(
+        goal.id,
+        goal.name,
+        goal.description,
+        goal.duedate,
+        goal.created_at,
+        goal.updated_at,
+      );
+    });
+
+    return goalDTOs;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error('Server error, check server console for more information');
   }
 };
 

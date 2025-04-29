@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { GoalDto } from '../dtos/GoalDto';
-import { createGoal, deleteGoal, getGoal } from '../services/goals.service';
+import { createGoal, deleteGoal, getGoal, getGoalsByPRojectIdService } from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 
 export const createNewGoal = async (
@@ -92,4 +92,22 @@ export const modifyAGoal = async (
   res: Response,
 ): Promise<void> => {
   
+};
+
+export const getGoalsByProjectId = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectIdStr = req.params.projectId;
+    const projectIdNumber = +projectIdStr;
+
+    const goals: GoalDataDto[] = await getGoalsByPRojectIdService(projectIdNumber);
+    
+    res.status(200).json(goals);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
 };

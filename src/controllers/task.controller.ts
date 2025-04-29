@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { TaskDto } from '../dtos/TaskDto';
 import { TaskDataDto } from '../dtos/TaskDataDto';
-import { createTask, deleteTask, gettask } from '../services/task.service';
+import { createTask, deleteTask, gettask, getTaskByGoalIdService } from '../services/task.service';
 
 
 export const createNewTask = async (
@@ -89,4 +89,22 @@ export const modifyATask = async (
   res: Response,
 ): Promise<void> => {
   
+};
+
+export const getTasksByGoalId = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const goalIdStr = req.params.goaltId;
+    const goalIdNumber = +goalIdStr;
+
+    const tasks: TaskDataDto[] = await getTaskByGoalIdService(goalIdNumber);
+    
+    res.status(200).json(tasks);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
 };

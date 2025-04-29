@@ -57,6 +57,7 @@ export const gettask = async (
     }
 
     const taskDto: TaskDataDto = new TaskDataDto(
+      task.id,
       task.name,
       task.description,
       task.label,
@@ -72,5 +73,34 @@ export const gettask = async (
       console.log(error);
     }
     throw new Error("Server error, check server console for more information")
+  }
+};
+
+export const getTaskByGoalIdService = async (
+  projectId: number,
+): Promise<TaskDataDto[]> => {
+  try {
+    const tasks = await Task.findAll({
+      where: { projectid: projectId },
+    });
+
+    const taskDTOs: TaskDataDto[] = tasks.map((task) => {
+      return new TaskDataDto(
+        task.id,
+        task.name,
+        task.description,
+        task.label,
+        task.duedate,
+        task.created_at,
+        task.updated_at,
+      );
+    });
+
+    return taskDTOs;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error('Server error, check server console for more information');
   }
 };
