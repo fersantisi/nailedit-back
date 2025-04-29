@@ -98,7 +98,7 @@ export const getGoalsByProjectId = async (
     const projectIdStr = req.params.projectId;
     const projectIdNumber = +projectIdStr;
 
-    const goals: GoalDataDto[] = await getGoalsByProjectIdService(goalIdNumber);
+    const goals: GoalDataDto[] = await getGoalsByProjectIdService(projectIdNumber);
     
     res.status(200).json(goals);
   } catch (error) {
