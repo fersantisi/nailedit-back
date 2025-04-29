@@ -73,7 +73,7 @@ export const getGoal = async (
   }
 };
 
-export const getGoalsByPRojectIdService = async (
+export const getGoalsByProjectIdService = async (
   projectId: number,
 ): Promise<GoalDataDto[]> => {
   try {
@@ -101,6 +101,33 @@ export const getGoalsByPRojectIdService = async (
   }
 };
 
+export const updateGoalName = async(name:string, projectId: number)=>{ 
+  const goal = await Goal.findByPk(projectId);
+  if (!goal) {
+    throw Error("Project not found");
+  }
 
+  goal.name = name;
 
-//export const modifyProject = async(projectId: ProjectDto)
+  await goal.save();
+}
+
+export const updateGoalDescription = async(description:string, projectId: number)=>{ 
+  const goal = await Goal.findByPk(projectId);
+  if (!goal) {
+    throw Error("Project not found");
+  }
+
+  goal.description = description;
+  await goal.save();
+}
+
+export const updateGoalDuedate = async(dueDate:string, projectId: number)=>{ 
+  const goal = await Goal.findByPk(projectId);
+  if (!goal) {
+    throw Error("Project not found");
+  }
+
+  goal.duedate = dueDate;
+  await goal.save();
+}

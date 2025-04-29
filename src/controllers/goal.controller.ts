@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { GoalDto } from '../dtos/GoalDto';
-import { createGoal, deleteGoal, getGoal, getGoalsByPRojectIdService } from '../services/goals.service';
+import { createGoal, deleteGoal, getGoal, getGoalsByProjectIdService, updateGoalDescription, updateGoalDuedate, updateGoalName } from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 
 export const createNewGoal = async (
@@ -11,8 +11,8 @@ export const createNewGoal = async (
   console.log('createNewGoal');
   
   try {
-    const projectIdSTR = req.params.projectId
-    const projectIdNumber = +projectIdSTR
+    const goalIdSTR = req.params.goalId
+    const goalIdNumber = +goalIdSTR
 
     const { name, description, dueDate } = req.body;
 
@@ -21,7 +21,7 @@ export const createNewGoal = async (
       name,
       description,
       dueDate,
-      projectIdNumber,
+      goalIdNumber,
     );
 
     console.log(goal.duedate);
@@ -87,22 +87,15 @@ export const getAGoal = async (
   }
 };
 
-export const modifyAGoal = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  
-};
-
 export const getGoalsByProjectId = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-    const projectIdStr = req.params.projectId;
-    const projectIdNumber = +projectIdStr;
+    const goalIdStr = req.params.goalId;
+    const goalIdNumber = +goalIdStr;
 
-    const goals: GoalDataDto[] = await getGoalsByPRojectIdService(projectIdNumber);
+    const goals: GoalDataDto[] = await getGoalsByProjectIdService(goalIdNumber);
     
     res.status(200).json(goals);
   } catch (error) {
@@ -111,3 +104,60 @@ export const getGoalsByProjectId = async (
     }
   }
 };
+
+export const updateAGoalName = async(req: Request, res: Response):Promise<void>=> {
+  const name = req.body.name;
+  const goalIdStr = req.params.goalId;
+  const goalIdNumber = +goalIdStr;
+  if(!name){
+    res.status(400).json({message: "Invalid Name."})
+  }
+
+  try {
+    updateGoalName(name, goalIdNumber);
+    res.status(200).json({message: "Name changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+  
+
+}
+
+export const updateAGoalDescription = async(req: Request, res: Response):Promise<void>=> {
+
+  const description = req.body.description;
+  const goalIdStr = req.params.goalId;
+  const goalIdNumber = +goalIdStr;
+  if(!description){
+    res.status(400).json({message: "Invalid description."})
+  }
+
+  try {
+    updateGoalDescription(description, goalIdNumber);
+    res.status(200).json({message: "Description changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+}
+
+export const updateAGoalDuedate = async(req: Request, res: Response):Promise<void>=> {
+  const duedate = req.body.image;
+  const goalIdStr = req.params.goalId;
+  const goalIdNumber = +goalIdStr;
+  if(!duedate){
+    res.status(400).json({message: "Invalid Image."})
+  }
+
+  try {
+    updateGoalDuedate(duedate , goalIdNumber);
+    res.status(200).json({message: "Inmage changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+}

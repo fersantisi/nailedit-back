@@ -107,5 +107,52 @@ export const getProjectsByUserIdService = async (
   }
 };
 
+export const updateProjectName = async(name:string, projectId: number)=>{ 
+  const project = await Project.findByPk(projectId);
+  if (!project) {
+    throw error("Project not found");
+  }
 
-//export const modifyProject = async(projectId: ProjectDto)
+  project.name = name;
+
+  await project.save();
+}
+
+export const updateProjectDescription = async(description:string, projectId: number)=>{ 
+  const project = await Project.findByPk(projectId);
+  if (!project) {
+    throw error("Project not found");
+  }
+
+  project.description = description;
+
+  await project.save();
+}
+export const updateProjectCategory = async(category:string, projectId: number)=>{ 
+  const project = await Project.findByPk(projectId);
+  if (!project) {
+    throw error("Project not found");
+  }
+
+  project.category = category;
+
+  await project.save();
+}
+export const updateProjectImage = async(image:string, projectId: number)=>{ 
+  const project = await Project.findByPk(projectId);
+  if (!project) {
+    throw error("Project not found");
+  }
+  project.image = image;
+  await project.save();
+}
+export const updateProjectDuedate = async(dueDate: string, projectId: number)=>{ 
+  const project = await Project.findByPk(projectId);
+  if (!project) {
+    throw error("Project not found");
+  }
+
+  project.duedate = dueDate;
+
+  await project.save();
+}

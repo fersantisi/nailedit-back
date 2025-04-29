@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { TaskDto } from '../dtos/TaskDto';
 import { TaskDataDto } from '../dtos/TaskDataDto';
-import { createTask, deleteTask, gettask, getTaskByGoalIdService } from '../services/task.service';
+import { createTask, deleteTask, gettask, getTaskByGoalIdService, updateTaskDescription, updateTaskDuedate, updateTaskLabel,  updateTaskName } from '../services/task.service';
 
 
 export const createNewTask = async (
@@ -84,13 +84,6 @@ export const getATask = async (
   }
 };
 
-export const modifyATask = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  
-};
-
 export const getTasksByGoalId = async (
   req: Request,
   res: Response,
@@ -108,3 +101,84 @@ export const getTasksByGoalId = async (
     }
   }
 };
+
+export const updateATaskName = async(req: Request, res: Response):Promise<void>=> {
+  const label = req.body.label;
+  const taskIdStr = req.params.taskId;
+  const tasktIdNumber = +taskIdStr;
+  if(!label){
+    res.status(400).json({message: "Invalid Name."})
+  }
+
+  try {
+    updateTaskName(label, tasktIdNumber);
+    res.status(200).json({message: "Label changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+  
+
+}
+
+export const updateATaskDescription = async(req: Request, res: Response):Promise<void>=> {
+  const description = req.body.description;
+  const taskIdStr = req.params.taskId;
+  const tasktIdNumber = +taskIdStr;
+  if(!description){
+    res.status(400).json({message: "Invalid description."})
+  }
+
+  try {
+    updateTaskDescription(description, tasktIdNumber);
+    res.status(200).json({message: "Description change succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+  
+
+}
+
+
+export const updateATaskLabel = async(req: Request, res: Response):Promise<void>=> {
+  const name = req.body.name;
+  const taskIdStr = req.params.taskId;
+  const tasktIdNumber = +taskIdStr;
+  if(!name){
+    res.status(400).json({message: "Invalid Label."})
+  }
+
+  try {
+    updateTaskLabel(name, tasktIdNumber);
+    res.status(200).json({message: "Name changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+  
+
+}
+
+export const updateATaskDuedate = async(req: Request, res: Response):Promise<void>=> {
+  const dueDate = req.body.dueDate;
+  const taskIdStr = req.params.taskId;
+  const tasktIdNumber = +taskIdStr;
+  if(!dueDate){
+    res.status(400).json({message: "Invalid duedate."})
+  }
+
+  try {
+    updateTaskDuedate(dueDate, tasktIdNumber);
+    res.status(200).json({message: "Duedate changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+  
+
+}

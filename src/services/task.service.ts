@@ -104,3 +104,48 @@ export const getTaskByGoalIdService = async (
     throw new Error('Server error, check server console for more information');
   }
 };
+
+export const updateTaskName = async(name:string, projectId: number)=>{ 
+  const task = await Task.findByPk(projectId);
+  if (!task) {
+    throw Error("Task not found");
+  }
+
+  task.name = name;
+
+  await task.save();
+}
+
+export const updateTaskDescription= async(description:string, projectId: number)=>{ 
+  const task = await Task.findByPk(projectId);
+  if (!task) {
+    throw Error("Task not found");
+  }
+
+  task.description = description;
+
+  await task.save();
+}
+
+export const updateTaskLabel = async(label:string, projectId: number)=>{ 
+  const task = await Task.findByPk(projectId);
+  if (!task) {
+    throw Error("Task not found");
+  }
+
+  task.label = label;
+
+  await task.save();
+}
+
+export const updateTaskDuedate = async(dueDate:string, projectId: number)=>{ 
+  const task = await Task.findByPk(projectId);
+  if (!task) {
+    throw Error("Task not found");
+  }
+
+  task.duedate = dueDate;
+
+  await task.save();
+}
+

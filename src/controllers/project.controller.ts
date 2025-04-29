@@ -6,6 +6,11 @@ import {
   deleteProject,
   getProject,
   getProjectsByUserIdService,
+  updateProjectCategory,
+  updateProjectDescription,
+  updateProjectDuedate,
+  updateProjectImage,
+  updateProjectName,
 } from '../services/project.service';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
 import { validateOrReject } from 'class-validator';
@@ -94,11 +99,6 @@ export const getAProject = async (
   }
 };
 
-export const modifyAProject = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {};
-
 export const getProjectsByUserId = async (
   req: Request,
   res: Response,
@@ -115,3 +115,92 @@ export const getProjectsByUserId = async (
     }
   }
 };
+
+export const updateAProjectName = async(req: Request, res: Response):Promise<void>=> {
+  const name = req.body.name;
+  const projectIdStr = req.params.projectId;
+  const projectIdNumber = +projectIdStr;
+  if(!name){
+    res.status(400).json({message: "Invalid Name."})
+  }
+
+  try {
+    updateProjectName(name, projectIdNumber);
+    res.status(200).json({message: "Name changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+  
+
+}
+export const updateAProjectDescription = async(req: Request, res: Response):Promise<void>=> {
+
+  const description = req.body.description;
+  const projectIdStr = req.params.projectId;
+  const projectIdNumber = +projectIdStr;
+  if(!description){
+    res.status(400).json({message: "Invalid description."})
+  }
+
+  try {
+    updateProjectDescription(description, projectIdNumber);
+    res.status(200).json({message: "Description changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+}
+export const updateAProjectCategory = async(req: Request, res: Response):Promise<void>=> {
+  const category = req.body.category;
+  const projectIdStr = req.params.projectId;
+  const projectIdNumber = +projectIdStr;
+  if(!category){
+    res.status(400).json({message: "Invalid Category."})
+  }
+
+  try {
+    updateProjectCategory(category, projectIdNumber);
+    res.status(200).json({message: "Name changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+}
+export const updateAProjectImage = async(req: Request, res: Response):Promise<void>=> {
+  const image = req.body.image;
+  const projectIdStr = req.params.projectId;
+  const projectIdNumber = +projectIdStr;
+  if(!image){
+    res.status(400).json({message: "Invalid Image."})
+  }
+
+  try {
+    updateProjectImage(image, projectIdNumber);
+    res.status(200).json({message: "Inmage changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+}
+export const updateAProjectDuedate = async(req: Request, res: Response):Promise<void>=> {
+  const duedate = req.body.image;
+  const projectIdStr = req.params.projectId;
+  const projectIdNumber = +projectIdStr;
+  if(!duedate){
+    res.status(400).json({message: "Invalid Image."})
+  }
+
+  try {
+    updateProjectDuedate(duedate , projectIdNumber);
+    res.status(200).json({message: "Inmage changed succesfully"})
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+}
