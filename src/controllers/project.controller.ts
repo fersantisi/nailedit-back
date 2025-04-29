@@ -5,6 +5,7 @@ import {
   createProject,
   deleteProject,
   getProject,
+  getProjectsByUserIdService,
 } from '../services/project.service';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
 import { validateOrReject } from 'class-validator';
@@ -17,6 +18,9 @@ export const createNewProject = async (
     const userId = await getTokenPayload(req.cookies.authToken).userId;
 
     const { name, description, category, image, dueDate } = req.body;
+
+    console.log(dueDate);
+    
 
     const project: ProjectDto = new ProjectDto(
       name,
@@ -92,6 +96,19 @@ export const getAProject = async (
 export const modifyAProject = async (
   req: Request,
   res: Response,
+): Promise<void> => {};
+
+export const getProjectsByUserId = async (
+  req: Request,
+  res: Response,
 ): Promise<void> => {
-  
+  try {
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
+    const projects: ProjectDataDto[] = await getProjectsByUserIdService(userId);
+    res.status(200).json(projects);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
 };

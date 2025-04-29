@@ -76,6 +76,34 @@ export const getProject = async (
   }
 };
 
+export const getProjectsByUserIdService = async (
+  userId: number,
+): Promise<ProjectDataDto[]> => {
+  try {
+    const projects = await Project.findAll({
+      where: { userid: userId },
+    });
+
+    const projectDTOs: ProjectDataDto[] = projects.map((project) => {
+      return new ProjectDataDto(
+        project.name,
+        project.description,
+        project.category,
+        project.image,
+        project.duedate,
+        project.created_at,
+        project.updated_at,
+      );
+    });
+
+    return projectDTOs;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error('Server error, check server console for more information');
+  }
+};
 
 
 //export const modifyProject = async(projectId: ProjectDto)

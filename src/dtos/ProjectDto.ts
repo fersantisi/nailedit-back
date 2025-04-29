@@ -21,7 +21,7 @@ export class ProjectDto{
     declare image: string;
 
     @IsOptional()
-    @IsDate()
+    @IsDateString()
     declare duedate: string;
 
     @IsNotEmpty()
