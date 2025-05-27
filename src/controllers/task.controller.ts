@@ -75,6 +75,8 @@ export const getATask = async (req: Request, res: Response): Promise<void> => {
   try {
     const taskId = req.params.taskId;
     const task: TaskDataDto = await gettask(taskId);
+    console.log('////////////////////', task);
+    
 
     res.status(201).json(task);
   } catch (error) {

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createNewProject,
   deleteAProject,
+  getAProject,
   getProjectsByUserId,
   updateAProject,
 } from '../controllers/project.controller';
@@ -14,6 +15,7 @@ router.post('/create', createNewProject);
 router.delete('/delete/:id', deleteAProject);
 router.get('/list', getProjectsByUserId);
 router.put('/:projectId/updateProject', updateAProject)
+router.get('/:projectId', getAProject);
 
 
 router.post('/:projectId/createGoal', createNewGoal )
@@ -26,7 +28,7 @@ router.post('/:projectId/goal/:goalId/createTask', createNewTask)
 router.get('/:projectId/goal/:goalId/task/:taskId', getATask)
 router.delete('/:projectId/goal/:goalId/task/:taskId', deleteATask)
 router.get('/:projectId/goal/:goalId/tasks', getTasksByGoalId);
-router.put('/:projectId/goal/:goalId/task/:taskId/updateProject', updateATask)
+router.put('/:projectId/goal/:goalId/task/:taskId/updateTask', updateATask)
 
 
 export default router;

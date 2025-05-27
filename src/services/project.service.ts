@@ -48,11 +48,9 @@ export const deleteProject = async (projectId: string) => {
   }
 };
 
-export const getProject = async (
-  projectId: string,
-): Promise<ProjectDataDto> => {
+export const getProject = async (projectIdNumber: number): Promise<ProjectDataDto> => {
   try {
-    const project = await Project.findByPk(projectId);
+    const project = await Project.findByPk(projectIdNumber);
     if (!project) {
       throw new Error('Project not found');
     }
@@ -68,13 +66,12 @@ export const getProject = async (
       project.updated_at,
     );
 
-    return projectDTO
-
+    return projectDTO;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
     }
-    throw new Error("Server error, check server console for more information")
+    throw new Error('Server error, check server console for more information');
   }
 };
 
@@ -122,3 +119,17 @@ export const updateProject = async(newData:UpdateProjectDto)=>{
   await project.save();
 }
 
+export const getProjectByIdService = async (projectId: string): Promise<Project | null> => {
+  try {
+    const project = await Project.findByPk(projectId);
+    if (!project) {
+      throw new Error('Project not found');
+    }
+    return project;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error('Server error, check server console for more information');
+  }
+}

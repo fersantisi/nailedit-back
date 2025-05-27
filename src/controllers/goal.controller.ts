@@ -12,8 +12,8 @@ export const createNewGoal = async (
   console.log('createNewGoal');
   
   try {
-    const goalIdSTR = req.params.goalId
-    const goalIdNumber = +goalIdSTR
+    const projectIdSTR = req.params.projectId
+    const projectIdNumber = +projectIdSTR
 
     const { name, description, dueDate } = req.body;
 
@@ -22,7 +22,7 @@ export const createNewGoal = async (
       name,
       description,
       dueDate,
-      goalIdNumber,
+      projectIdNumber,
     );
 
     console.log(goal.duedate);

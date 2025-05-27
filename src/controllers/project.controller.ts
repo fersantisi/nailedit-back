@@ -5,6 +5,7 @@ import {
   createProject,
   deleteProject,
   getProject,
+  getProjectByIdService,
   getProjectsByUserIdService,
   updateProject,
 } from '../services/project.service';
@@ -83,10 +84,17 @@ export const getAProject = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const projectId = req.params.id;
-    const project: ProjectDataDto = await getProject(projectId);
+    const projectId = req.params.projectId;
+    const projectIdNumber = +projectId;
 
+    console.log(projectId);
+    
+
+    const project: ProjectDataDto = await getProject(projectIdNumber);
+    console.log(project);
+    
     res.status(201).json(project);
+    
   } catch (error) {
     if (error instanceof Error) {
       res.status(418).json({ message: error.message });
