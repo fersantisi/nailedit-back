@@ -2,7 +2,6 @@ import { error } from 'console';
 import Project from '../database/models/Project';
 import { ProjectDto } from '../dtos/ProjectDto';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
-import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 
 export const createProject = async (project: ProjectDto) => {
 
@@ -23,11 +22,10 @@ export const createProject = async (project: ProjectDto) => {
       dueDate: project.duedate,
       userid: project.userId,
     });
-    console.log(newProject);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
-      throw new Error('Project name already in use.');
+      throw new Error(error.message);
     }
   }
   
@@ -39,7 +37,6 @@ export const deleteProject = async (projectId: string) => {
     if (!project) {
       throw new Error('Project not found');
     }
-
     await project.destroy();
   } catch (error) {
     if (error instanceof Error) {
@@ -108,8 +105,8 @@ export const getProjectsByUserIdService = async (
   }
 };
 
-export const updateProject = async(newData:UpdateProjectDto)=>{ 
-  const project = await Project.findByPk(newData.projectId);
+export const updateProject = async(newData:ProjectDto,projectId: number)=>{ 
+  const project = await Project.findByPk(projectId);
 
   if (!project) {
     throw error("Project not found");

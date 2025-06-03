@@ -10,7 +10,6 @@ import {
 } from '../services/project.service';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
 import { validateOrReject } from 'class-validator';
-import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 
 export const createNewProject = async (
   req: Request,
@@ -113,25 +112,27 @@ export const getProjectsByUserId = async (
 
 export const updateAProject = async(req: Request, res: Response):Promise<void>=> {
   try{
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
     const { name, description, category, image, dueDate } = req.body;
+
     const projectIdStr = req.params.projectId;
     const projectIdNumber = +projectIdStr;
 
-    const project: UpdateProjectDto = new UpdateProjectDto(
+    const project: ProjectDto = new ProjectDto(
       name,
       description,
       category,
       image,
       dueDate,
-      projectIdNumber,
+      userId
     );
 
     await validateOrReject(project);
 
-    await updateProject(project);
+    await updateProject(project,projectIdNumber);
 
     res.status(201).json({
-      message: 'Project created',
+      message: 'Project updated',
     });
   } catch (error: unknown) {
     console.log(error);

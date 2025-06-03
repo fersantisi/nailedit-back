@@ -2,6 +2,7 @@ import {INTEGER, Optional} from "sequelize"
 import { Table, Column, DataType, Model, HasMany, PrimaryKey, AutoIncrement, Unique, ForeignKey, CreatedAt, UpdatedAt, BelongsTo } from 'sequelize-typescript';
 import User from "./User"
 import Goal from "./Goal";
+import Note from "./Note";
 
 @Table({
   timestamps: true,
@@ -60,6 +61,9 @@ class Project extends Model {
 
   @HasMany(() => Goal)
   declare goal: Goal[];
+
+  @HasMany(() => Note)
+  declare note: Note[];
 }
 
 

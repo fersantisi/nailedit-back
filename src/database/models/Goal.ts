@@ -1,6 +1,8 @@
-import { Table, Column, DataType, Model, ForeignKey, CreatedAt, UpdatedAt, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, DataType, Model, ForeignKey, CreatedAt, UpdatedAt, BelongsTo, HasMany } from 'sequelize-typescript';
 import User from "./User"
 import Project from './Project';
+import Note from './Note';
+import Task from './Task';
 
 @Table({
   timestamps: true,
@@ -46,6 +48,12 @@ class Goal extends Model {
     onDelete: 'CASCADE',
   })
   declare project: Project;
+
+  @HasMany(() => Note)
+  declare note: Note[];
+
+  @HasMany(() => Task)
+  declare task: Task[];
 }
 
 

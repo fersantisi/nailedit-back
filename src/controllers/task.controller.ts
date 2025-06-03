@@ -3,7 +3,7 @@ import { validateOrReject } from 'class-validator';
 import { TaskDto } from '../dtos/TaskDto';
 import { TaskDataDto } from '../dtos/TaskDataDto';
 import { createTask, deleteTask, gettask, getTaskByGoalIdService, updateTask} from '../services/task.service';
-import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
+
 
 
 export const createNewTask = async (
@@ -114,20 +114,23 @@ export const updateATask = async(req: Request, res: Response):Promise<void>=> {
     const taskIdStr = req.params.taskId;
     const taskIdNumber = +taskIdStr;
 
-    const task: UpdateTaskDto = new UpdateTaskDto(
+    const goalIdStr = req.params.goalId;
+    const goalIdNumber = +goalIdStr;
+
+    const task: TaskDto = new TaskDto(
       name,
       description,
       category,
       dueDate,
-      taskIdNumber,
+      goalIdNumber,
     );
 
     await validateOrReject(task);
 
-    await updateTask(task);
+    await updateTask(task,taskIdNumber);
 
     res.status(201).json({
-      message: 'Task created',
+      message: 'Task updated',
     });
   } catch (error: unknown) {
     console.log(error);

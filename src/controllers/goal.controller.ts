@@ -3,7 +3,6 @@ import { validateOrReject } from 'class-validator';
 import { GoalDto } from '../dtos/GoalDto';
 import { createGoal, deleteGoal, getGoal, getGoalsByProjectIdService, updateGoal} from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
-import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
 
 export const createNewGoal = async (
   req: Request,
@@ -114,7 +113,7 @@ export const updateAGoal = async(req: Request, res: Response):Promise<void>=> {
     const goalIdStr = req.params.goalId;
     const goalIdNumber = +goalIdStr;
 
-    const goal: UpdateGoalDto = new UpdateGoalDto(
+    const goal: GoalDto = new GoalDto(
       name,
       description,
       dueDate,

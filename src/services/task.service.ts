@@ -1,8 +1,6 @@
 import Task from "../database/models/Task";
 import { TaskDataDto } from "../dtos/TaskDataDto";
 import { TaskDto } from "../dtos/TaskDto";
-import { UpdateProjectDto } from "../dtos/UpdateProjectDto";
-import { UpdateTaskDto } from "../dtos/UpdateTaskDto";
 
 
 export const createTask = async (task: TaskDto) => {
@@ -114,9 +112,9 @@ export const getTaskByGoalIdService = async (
   }
 };
 
-export const updateTask = async(newData:UpdateTaskDto)=>{ 
+export const updateTask = async(newData:TaskDto,taskId: number)=>{ 
 
-  const task = await Task.findByPk(newData.taskId);
+  const task = await Task.findByPk();
   
   if (!task) {
     throw Error("task not found");
