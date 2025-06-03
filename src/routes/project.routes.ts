@@ -17,6 +17,9 @@ router.get('/list', getProjectsByUserId);
 router.put('/:projectId/updateProject', updateAProject)
 router.get('/:projectId', getAProject);
 
+//get proyect reserved stock
+router.get('/:id/stock',getAllProjectStock);
+
 
 router.post('/:projectId/createGoal', createNewGoal )
 router.delete('/:projectId/goal/:goalId', deleteAGoal)

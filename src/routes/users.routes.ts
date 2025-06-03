@@ -19,4 +19,7 @@ router.put('/:id', updateUser);
 router.get('/profile/:id', getUser);
 router.get('/me', loggedIn);
 
+//get user stock
+router.get('/:id/stock',getAllstock);
+
 export default router;

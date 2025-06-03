@@ -1,6 +1,7 @@
 import {Optional} from "sequelize"
 import { Table, Column, DataType, Model, HasMany, PrimaryKey, AutoIncrement, Unique, ForeignKey } from 'sequelize-typescript';
 import Proyect from "./Project"
+import Stock from "./Stock";
 
 interface UserAttributes { 
     id: number
@@ -44,6 +45,9 @@ class User extends Model<UserAttributes,UserCreationAttributes> {
 
   @HasMany(() => Proyect)
   declare proyects: Proyect[];
+
+  @HasMany(() => Stock)
+  declare stocks: Stock[];
 }
 
 export default User
