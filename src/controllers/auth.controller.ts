@@ -25,7 +25,9 @@ export const getLogin = async (req: Request, res: Response) => {
       setAuthCookie(res, authToken);
       setRefreshCookie(res, refreshToken);
 
-      res.json({ message: 'Login successful' });
+      const admin = username == 'admin';
+
+      res.json({ message: 'Login successful', admin: admin });
     } else {
       res.status(409).json({ message: 'invalid credentials.' });
     }

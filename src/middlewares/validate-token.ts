@@ -22,6 +22,8 @@ export const validateToken = (
     } catch (error) {
       if (refreshSession(authToken, refreshToken, req, res)) {
         next();
+      } else {
+        res.status(401).json({ message: 'Acces Denied.' });
       }
     }
   } else {
