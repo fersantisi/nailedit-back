@@ -17,7 +17,7 @@ export class UpdateGoalDto {
 
   @IsOptional()
   @IsDateString()
-  declare duedate: string;
+  declare dueDate: string;
 
   @IsNotEmpty()
   @IsNumber()
@@ -26,12 +26,12 @@ export class UpdateGoalDto {
   constructor(
     name: string,
     description: string,
-    duedate: string,
+    dueDate: string,
     goalId: number,
   ) {
     this.name = name;
     this.description = description;
-    this.duedate = duedate;
+    this.dueDate = dueDate;
     this.goalId = goalId;
   }
 }

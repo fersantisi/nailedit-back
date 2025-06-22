@@ -1,5 +1,5 @@
 import {
-    IsDate,
+  IsDate,
   IsDateString,
   IsNotEmpty,
   IsNumber,
@@ -8,7 +8,6 @@ import {
 } from 'class-validator';
 
 export class GoalDataDto {
-  
   @IsNumber()
   declare id: number;
 
@@ -22,7 +21,7 @@ export class GoalDataDto {
 
   @IsOptional()
   @IsDateString()
-  declare duedate: string;
+  declare dueDate: string;
 
   @IsNotEmpty()
   @IsDateString()
@@ -36,14 +35,14 @@ export class GoalDataDto {
     goalId: number,
     name: string,
     description: string,
-    duedate: string,
+    dueDate: string,
     creationDate: Date,
     updatedDate: Date,
   ) {
-    this.id = goalId
+    this.id = goalId;
     this.name = name;
     this.description = description;
-    this.duedate = duedate;
+    this.dueDate = dueDate;
     this.creationDate = creationDate;
     this.updatedDate = updatedDate;
   }

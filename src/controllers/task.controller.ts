@@ -2,9 +2,17 @@ import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { TaskDto } from '../dtos/TaskDto';
 import { TaskDataDto } from '../dtos/TaskDataDto';
-import { createTask, deleteTask, gettask, getTaskByGoalIdService, updateTask} from '../services/task.service';
+import {
+  createTask,
+  deleteTask,
+  gettask,
+  getTaskByGoalIdService,
+  updateTask,
+  getAllTasks,
+  getTaskWithGoalId,
+} from '../services/task.service';
 import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
-
+import { validateTaskDueDate } from '../utils/validateDueDate';
 
 export const createNewTask = async (
   req: Request,
@@ -13,12 +21,19 @@ export const createNewTask = async (
   try {
     const goalIdSTR = req.params.goalId;
     const goalIdNumber = +goalIdSTR;
-    
 
     const { name, description, label, dueDate } = req.body;
-    
+
     console.log(dueDate);
-    
+
+    // Validate that task due date is not later than goal due date
+    const isDueDateValid = await validateTaskDueDate(goalIdNumber, dueDate);
+    if (!isDueDateValid) {
+      res.status(400).json({
+        message: 'Task due date cannot be later than the goal due date',
+      });
+      return;
+    }
 
     const task: TaskDto = new TaskDto(
       name,
@@ -76,7 +91,6 @@ export const getATask = async (req: Request, res: Response): Promise<void> => {
     const taskId = req.params.taskId;
     const task: TaskDataDto = await gettask(taskId);
     console.log('////////////////////', task);
-    
 
     res.status(201).json(task);
   } catch (error) {
@@ -101,7 +115,7 @@ export const getTasksByGoalId = async (
 
     const tasks: TaskDataDto[] = await getTaskByGoalIdService(goalIdNumber);
     console.log(tasks);
-    
+
     res.status(200).json(tasks);
   } catch (error) {
     if (error instanceof Error) {
@@ -110,13 +124,35 @@ export const getTasksByGoalId = async (
   }
 };
 
-export const updateATask = async(req: Request, res: Response):Promise<void>=> {
-  try{
+export const updateATask = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
     const { name, description, category, dueDate } = req.body;
     const taskIdStr = req.params.taskId;
     const taskIdNumber = +taskIdStr;
 
-    const task: UpdateTaskDto = new UpdateTaskDto(
+    // Get the task to find its goal ID
+    const task = await getTaskWithGoalId(taskIdStr);
+    if (!task) {
+      res.status(404).json({ message: 'Task not found' });
+      return;
+    }
+
+    // Get the goal ID from the task
+    const goalId = task.goalId;
+
+    // Validate that task due date is not later than goal due date
+    const isDueDateValid = await validateTaskDueDate(goalId, dueDate);
+    if (!isDueDateValid) {
+      res.status(400).json({
+        message: 'Task due date cannot be later than the goal due date',
+      });
+      return;
+    }
+
+    const taskUpdate: UpdateTaskDto = new UpdateTaskDto(
       name,
       description,
       category,
@@ -124,12 +160,12 @@ export const updateATask = async(req: Request, res: Response):Promise<void>=> {
       taskIdNumber,
     );
 
-    await validateOrReject(task);
+    await validateOrReject(taskUpdate);
 
-    await updateTask(task);
+    await updateTask(taskUpdate);
 
     res.status(201).json({
-      message: 'Task created',
+      message: 'Task updated',
     });
   } catch (error: unknown) {
     console.log(error);
@@ -145,6 +181,34 @@ export const updateATask = async(req: Request, res: Response):Promise<void>=> {
       res.status(500).json({ message: error.message });
     } else {
       res.status(500).json({ message: 'Unknown error' });
-    } 
+    }
   }
-}
+};
+
+export const getAllTasksController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const tasks = await getAllTasks();
+
+    // Transform the response to match frontend expectations
+    const transformedTasks = tasks.map((task) => ({
+      id: task.id,
+      goalId: task.goalId,
+      projectId: task.projectId,
+      name: task.name,
+      description: task.description,
+      label: task.label,
+      dueDate: task.dueDate,
+    }));
+
+    res.status(200).json(transformedTasks);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};

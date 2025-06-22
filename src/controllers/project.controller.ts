@@ -12,6 +12,7 @@ import {
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
 import { validateOrReject } from 'class-validator';
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
+import { validateProjectDueDateUpdate } from '../utils/validateDueDate';
 
 export const createNewProject = async (
   req: Request,
@@ -23,7 +24,6 @@ export const createNewProject = async (
     const { name, description, category, image, dueDate } = req.body;
 
     console.log(dueDate);
-    
 
     const project: ProjectDto = new ProjectDto(
       name,
@@ -88,13 +88,11 @@ export const getAProject = async (
     const projectIdNumber = +projectId;
 
     console.log(projectId);
-    
 
     const project: ProjectDataDto = await getProject(projectIdNumber);
     console.log(project);
-    
+
     res.status(201).json(project);
-    
   } catch (error) {
     if (error instanceof Error) {
       res.status(418).json({ message: error.message });
@@ -110,7 +108,7 @@ export const getProjectsByUserId = async (
     const userId = await getTokenPayload(req.cookies.authToken).userId;
     const projects: ProjectDataDto[] = await getProjectsByUserIdService(userId);
     console.log(projects);
-    
+
     res.status(200).json(projects);
   } catch (error) {
     if (error instanceof Error) {
@@ -119,11 +117,28 @@ export const getProjectsByUserId = async (
   }
 };
 
-export const updateAProject = async(req: Request, res: Response):Promise<void>=> {
-  try{
+export const updateAProject = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
     const { name, description, category, image, dueDate } = req.body;
     const projectIdStr = req.params.projectId;
     const projectIdNumber = +projectIdStr;
+
+    // Validate that project due date update doesn't conflict with existing goals and tasks
+    const validationResult = await validateProjectDueDateUpdate(
+      projectIdNumber,
+      dueDate,
+    );
+    if (!validationResult.isValid) {
+      res.status(400).json({
+        message:
+          'Project due date update conflicts with existing goals or tasks',
+        conflicts: validationResult.conflicts,
+      });
+      return;
+    }
 
     const project: UpdateProjectDto = new UpdateProjectDto(
       name,
@@ -139,7 +154,7 @@ export const updateAProject = async(req: Request, res: Response):Promise<void>=>
     await updateProject(project);
 
     res.status(201).json({
-      message: 'Project created',
+      message: 'Project updated',
     });
   } catch (error: unknown) {
     console.log(error);
@@ -155,6 +170,6 @@ export const updateAProject = async(req: Request, res: Response):Promise<void>=>
       res.status(500).json({ message: error.message });
     } else {
       res.status(500).json({ message: 'Unknown error' });
-    } 
+    }
   }
-}
+};

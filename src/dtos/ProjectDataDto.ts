@@ -1,5 +1,5 @@
 import {
-    IsDate,
+  IsDate,
   IsDateString,
   IsNotEmpty,
   IsNumber,
@@ -30,7 +30,7 @@ export class ProjectDataDto {
 
   @IsOptional()
   @IsDateString()
-  declare duedate: string;
+  declare dueDate: string;
 
   @IsNotEmpty()
   @IsDateString()
@@ -46,7 +46,7 @@ export class ProjectDataDto {
     description: string,
     category: string,
     image: string,
-    duedate: string,
+    dueDate: string,
     creationDate: Date,
     updatedDate: Date,
   ) {
@@ -55,7 +55,7 @@ export class ProjectDataDto {
     this.description = description;
     this.category = category;
     this.image = image;
-    this.duedate = duedate;
+    this.dueDate = dueDate;
     this.creationDate = creationDate;
     this.updatedDate = updatedDate;
   }

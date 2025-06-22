@@ -1,7 +1,20 @@
-import {INTEGER, Optional} from "sequelize"
-import { Table, Column, DataType, Model, HasMany, PrimaryKey, AutoIncrement, Unique, ForeignKey, CreatedAt, UpdatedAt, BelongsTo } from 'sequelize-typescript';
-import User from "./User"
-import Goal from "./Goal";
+import { INTEGER, Optional } from 'sequelize';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  HasMany,
+  PrimaryKey,
+  AutoIncrement,
+  Unique,
+  ForeignKey,
+  CreatedAt,
+  UpdatedAt,
+  BelongsTo,
+} from 'sequelize-typescript';
+import User from './User';
+import Goal from './Goal';
 
 @Table({
   timestamps: true,
@@ -20,7 +33,7 @@ class Project extends Model {
   @Column({
     type: DataType.INTEGER,
   })
-  declare userid: number;
+  declare userId: number;
 
   @Column({
     type: DataType.STRING,
@@ -45,7 +58,7 @@ class Project extends Model {
   @Column({
     type: DataType.STRING,
   })
-  declare duedate: string;
+  declare dueDate: string;
 
   @CreatedAt
   declare created_at: Date;
@@ -53,7 +66,7 @@ class Project extends Model {
   @UpdatedAt
   declare updated_at: Date;
 
-  @BelongsTo(()=>User, {
+  @BelongsTo(() => User, {
     onDelete: 'CASCADE',
   })
   declare user: User;
@@ -62,6 +75,4 @@ class Project extends Model {
   declare goal: Goal[];
 }
 
-
-
-export default Project
+export default Project;

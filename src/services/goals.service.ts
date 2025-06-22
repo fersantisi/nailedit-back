@@ -1,24 +1,23 @@
-import Goal from '../database/models/Goal'
+import Goal from '../database/models/Goal';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { GoalDto } from '../dtos/GoalDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
 
 export const createGoal = async (goal: GoalDto) => {
-
   try {
     const existingGoal = await Goal.findOne({
       where: { name: goal.name },
     });
-  
+
     if (existingGoal) {
       throw new Error('Goal name already in use.');
     }
-  
+
     const newGoal = await Goal.create({
       name: goal.name,
       description: goal.description,
-      duedate: goal.duedate,
-      projectid: goal.projectId,
+      dueDate: goal.dueDate,
+      projectId: goal.projectId,
     });
     console.log(newGoal);
   } catch (error) {
@@ -27,7 +26,6 @@ export const createGoal = async (goal: GoalDto) => {
       throw new Error('Goal name already in use.');
     }
   }
-  
 };
 
 export const deleteGoal = async (goalId: string) => {
@@ -38,7 +36,6 @@ export const deleteGoal = async (goalId: string) => {
     }
 
     await goal.destroy();
-
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
@@ -46,9 +43,7 @@ export const deleteGoal = async (goalId: string) => {
   }
 };
 
-export const getGoal = async (
-  goalId: string,
-): Promise<GoalDataDto> => {
+export const getGoal = async (goalId: string): Promise<GoalDataDto> => {
   try {
     const goal = await Goal.findByPk(goalId);
     if (!goal) {
@@ -59,18 +54,17 @@ export const getGoal = async (
       goal.id,
       goal.name,
       goal.description,
-      goal.duedate,
+      goal.dueDate,
       goal.created_at,
       goal.updated_at,
     );
 
-    return goalDto
-
+    return goalDto;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
     }
-    throw new Error("Server error, check server console for more information")
+    throw new Error('Server error, check server console for more information');
   }
 };
 
@@ -79,7 +73,7 @@ export const getGoalsByProjectIdService = async (
 ): Promise<GoalDataDto[]> => {
   try {
     const goals = await Goal.findAll({
-      where: { projectid: projectId },
+      where: { projectId: projectId },
     });
 
     const goalDTOs: GoalDataDto[] = goals.map((goal) => {
@@ -87,7 +81,7 @@ export const getGoalsByProjectIdService = async (
         goal.id,
         goal.name,
         goal.description,
-        goal.duedate,
+        goal.dueDate,
         goal.created_at,
         goal.updated_at,
       );
@@ -102,14 +96,29 @@ export const getGoalsByProjectIdService = async (
   }
 };
 
-export const updateGoal = async(newData:UpdateGoalDto)=>{ 
+export const updateGoal = async (newData: UpdateGoalDto) => {
   const goal = await Goal.findByPk(newData.goalId);
 
   if (!goal) {
-    throw Error("Project not found");
+    throw Error('Project not found');
   }
   goal.name = newData.name;
-  goal.description = newData.description
-  goal.duedate = newData.duedate
+  goal.description = newData.description;
+  goal.dueDate = newData.dueDate;
   await goal.save();
-}
+};
+
+export const getGoalWithProjectId = async (goalId: string) => {
+  try {
+    const goal = await Goal.findByPk(goalId);
+    if (!goal) {
+      throw new Error('Goal not found');
+    }
+    return goal;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error('Server error, check server console for more information');
+  }
+};

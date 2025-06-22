@@ -1,5 +1,14 @@
-import { Table, Column, DataType, Model, ForeignKey, CreatedAt, UpdatedAt, BelongsTo } from 'sequelize-typescript';
-import User from "./User"
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  ForeignKey,
+  CreatedAt,
+  UpdatedAt,
+  BelongsTo,
+} from 'sequelize-typescript';
+import User from './User';
 import Project from './Project';
 
 @Table({
@@ -19,7 +28,7 @@ class Goal extends Model {
   @Column({
     type: DataType.INTEGER,
   })
-  declare projectid: number;
+  declare projectId: number;
 
   @Column({
     type: DataType.STRING,
@@ -34,7 +43,7 @@ class Goal extends Model {
   @Column({
     type: DataType.STRING,
   })
-  declare duedate: string;
+  declare dueDate: string;
 
   @CreatedAt
   declare created_at: Date;
@@ -42,12 +51,10 @@ class Goal extends Model {
   @UpdatedAt
   declare updated_at: Date;
 
-  @BelongsTo(()=>Project, {
+  @BelongsTo(() => Project, {
     onDelete: 'CASCADE',
   })
   declare project: Project;
 }
 
-
-
-export default Goal
+export default Goal;
