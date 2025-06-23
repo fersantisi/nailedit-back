@@ -2,6 +2,7 @@ import Goal from '../database/models/Goal';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { GoalDto } from '../dtos/GoalDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
+import Project from '../database/models/Project';
 
 export const createGoal = async (goal: GoalDto) => {
   try {
@@ -115,6 +116,38 @@ export const getGoalWithProjectId = async (goalId: string) => {
       throw new Error('Goal not found');
     }
     return goal;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error('Server error, check server console for more information');
+  }
+};
+
+export const getAllGoals = async (): Promise<any[]> => {
+  try {
+    const goals = await Goal.findAll({
+      include: [
+        {
+          model: Project,
+          as: 'project',
+        },
+      ],
+    });
+
+    const goalDTOs = goals.map((goal) => {
+      return {
+        id: goal.id,
+        projectId: goal.projectId,
+        name: goal.name,
+        description: goal.description,
+        dueDate: goal.dueDate,
+        createdAt: goal.created_at,
+        updatedAt: goal.updated_at,
+      };
+    });
+
+    return goalDTOs;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);

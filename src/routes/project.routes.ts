@@ -12,6 +12,7 @@ import {
   getAGoal,
   getGoalsByProjectId,
   updateAGoal,
+  getAllGoalsController,
 } from '../controllers/goal.controller';
 import {
   createNewTask,
@@ -41,7 +42,8 @@ router.delete('/:projectId/goal/:goalId/task/:taskId', deleteATask);
 router.get('/:projectId/goal/:goalId/tasks', getTasksByGoalId);
 router.put('/:projectId/goal/:goalId/task/:taskId/updateTask', updateATask);
 
-// Global task routes (not nested under specific project/goal)
+// Global routes (not nested under specific project/goal)
+router.get('/goals/list', getAllGoalsController);
 router.get('/tasks/list', getAllTasksController);
 
 export default router;

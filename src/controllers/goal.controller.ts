@@ -8,6 +8,7 @@ import {
   getGoalsByProjectIdService,
   updateGoal,
   getGoalWithProjectId,
+  getAllGoals,
 } from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
@@ -176,6 +177,32 @@ export const updateAGoal = async (
         })),
       });
     } else if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};
+
+export const getAllGoalsController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const goals = await getAllGoals();
+
+    // Transform the response to match frontend expectations
+    const transformedGoals = goals.map((goal) => ({
+      id: goal.id,
+      projectId: goal.projectId,
+      name: goal.name,
+      description: goal.description,
+      dueDate: goal.dueDate,
+    }));
+
+    res.status(200).json(transformedGoals);
+  } catch (error) {
+    if (error instanceof Error) {
       res.status(500).json({ message: error.message });
     } else {
       res.status(500).json({ message: 'Unknown error' });
