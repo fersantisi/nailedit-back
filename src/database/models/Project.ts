@@ -16,6 +16,7 @@ import {
 import User from './User';
 import Goal from './Goal';
 import Note from "./Note";
+import File from './File';
 
 @Table({
   timestamps: true,
@@ -77,6 +78,9 @@ class Project extends Model {
 
   @HasMany(() => Note)
   declare note: Note[];
+
+  @HasMany(() => File)
+  declare files: File[];
 }
 
 export default Project;

@@ -23,7 +23,13 @@ import {
   getAllTasksController,
 } from '../controllers/task.controller';
 import { createNewNote, deleteANote, getAllObjectNotes, getANote, updateANote } from '../controllers/note.controller';
-import { getNoteByGoalIdService } from '../services/note.service';
+import {
+  uploadFile,
+  getFilesForProject,
+  getFile,
+  removeFile,
+} from '../controllers/file.controller';
+import { upload } from '../middlewares/file.middleware';
 
 const router = Router();
 
@@ -71,5 +77,10 @@ router.put('/:projectId/goal/:goalId/task/:taskId/updateTask', updateATask);
 // Global routes (not nested under specific project/goal)
 router.get('/goals/list', getAllGoalsController);
 router.get('/tasks/list', getAllTasksController);
+
+router.post('/:projectId/upload', upload.single('file'), uploadFile);
+router.get('/:projectId/files', getFilesForProject);
+router.get('/:projectId/files/:fileId', getFile);
+router.delete('/:projectId/files/:fileId', removeFile);
 
 export default router;
