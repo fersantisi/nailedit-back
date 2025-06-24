@@ -58,6 +58,7 @@ export const getGoal = async (goalId: string): Promise<GoalDataDto> => {
       goal.dueDate,
       goal.created_at,
       goal.updated_at,
+      goal.completed,
     );
 
     return goalDto;
@@ -85,6 +86,7 @@ export const getGoalsByProjectIdService = async (
         goal.dueDate,
         goal.created_at,
         goal.updated_at,
+        goal.completed,
       );
     });
 

@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsBoolean,
 } from 'class-validator';
 
 export class GoalDataDto {
@@ -31,6 +32,10 @@ export class GoalDataDto {
   @IsDateString()
   declare updatedDate: Date;
 
+  @IsNotEmpty()
+  @IsBoolean()
+  declare completed: boolean;
+
   constructor(
     goalId: number,
     name: string,
@@ -38,6 +43,7 @@ export class GoalDataDto {
     dueDate: string,
     creationDate: Date,
     updatedDate: Date,
+    completed: boolean,
   ) {
     this.id = goalId;
     this.name = name;
@@ -45,5 +51,6 @@ export class GoalDataDto {
     this.dueDate = dueDate;
     this.creationDate = creationDate;
     this.updatedDate = updatedDate;
+    this.completed = completed;
   }
 }

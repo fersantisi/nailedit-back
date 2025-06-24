@@ -213,3 +213,24 @@ export const getAllGoalsController = async (
     }
   }
 };
+
+export const setGoalCompleted = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectId = req.params.projectId;
+    const goalId = req.params.goalId;
+    const { completed } = req.body;
+    const goal = await getGoalWithProjectId(goalId);
+    if (!goal || String(goal.projectId) !== String(projectId)) {
+      res.status(404).json({ message: 'Goal not found for this project' });
+      return;
+    }
+    goal.completed = completed;
+    await goal.save();
+    res.status(200).json({ message: 'Goal completion updated', completed });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating goal completion' });
+  }
+};

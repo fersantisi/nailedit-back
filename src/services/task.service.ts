@@ -62,6 +62,7 @@ export const gettask = async (taskId: string): Promise<TaskDataDto> => {
       task.dueDate,
       task.created_at,
       task.updated_at,
+      task.completed,
     );
 
     return taskDto;
@@ -95,6 +96,7 @@ export const getTaskByGoalIdService = async (
         task.dueDate,
         task.created_at,
         task.updated_at,
+        task.completed,
       );
     });
 
@@ -152,6 +154,7 @@ export const getAllTasks = async (userId?: number): Promise<any[]> => {
         dueDate: task.dueDate,
         createdAt: task.created_at,
         updatedAt: task.updated_at,
+        completed: task.completed,
       };
     });
 
