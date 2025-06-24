@@ -137,3 +137,28 @@ export const getProjectByIdService = async (projectId: string): Promise<Project 
     throw new Error('Server error, check server console for more information');
   }
 }
+
+export const getAllProjects = async (): Promise<ProjectDto[]> => {
+  try {
+    const projects = await Project.findAll();
+    const projectDTOs: ProjectDto[] = projects.map((project) => {
+      return new ProjectDto(
+        project.id,
+        project.userid,
+        project.name,
+        project.description,
+        project.category,
+        project.image,
+        project.duedate,
+        project.created_at,
+        project.updated_at,
+      );
+    });
+    return projectDTOs;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error('Server error, check server console for more information');
+  }
+}

@@ -8,6 +8,7 @@ import {
 } from '../controllers/project.controller';
 import { createNewGoal, deleteAGoal, getAGoal, getGoalsByProjectId, updateAGoal} from '../controllers/goal.controller';
 import { createNewTask, deleteATask, getATask, getTasksByGoalId, updateATask} from '../controllers/task.controller';
+import { acceptAParticipationRequest, getAllParticipationRequests, getAllProjectParticipants, rejectAParticipationRequest, removeAParticipant } from '../controllers/community.controller';
 
 
 const router = Router();
@@ -16,6 +17,13 @@ router.delete('/delete/:id', deleteAProject);
 router.get('/list', getProjectsByUserId);
 router.put('/:projectId/updateProject', updateAProject)
 router.get('/:projectId', getAProject);
+
+router.get('/:projectId/participants', getAllProjectParticipants);
+router.get('/:projectId/participantsRequests', getAllParticipationRequests);
+router.post('/:projectId/participantionRequest/:requestId/accept', acceptAParticipationRequest);
+router.post('/:projectId/participantionRequest/:requestId/reject', rejectAParticipationRequest);
+router.delete('/:projectId/participants/:participantId/remove', removeAParticipant);
+
 
 //get proyect reserved stock
 router.get('/:id/stock',getAllProjectStock);
