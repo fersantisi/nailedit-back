@@ -3,10 +3,11 @@ import { validateOrReject } from 'class-validator';
 import { getTokenPayload } from '../services/token.service';
 import { StockDto } from '../dtos/StockDto';
 import { ReserveStockDto } from '../dtos/ReserveStockDto';
+import { createStock, deleteStock, getAllProjectStock, getUserStock, reserveStock, unreserveStock, updateReservedStock, updateStock, useReservedStock } from '../services/stock.service';
 
 
 
-export const getAllProjectStock = async (
+export const getAllProjectReservedStock = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -14,10 +15,8 @@ export const getAllProjectStock = async (
         const projectId = req.params.id;
         const projectIdNumber = +projectId;
     
-        // Assuming you have a service to get the stock for a project
-        const stock: ReserveStockDto[] = await getProjectStock(projectIdNumber);
-        
-        res.status(200).json(stock);
+        const reservedStock: ReserveStockDto[] = await getAllProjectStock(projectIdNumber);        
+        res.status(200).json(reservedStock);
     } catch (error) {
         if (error instanceof Error) {
         res.status(418).json({ message: error.message });
@@ -186,6 +185,25 @@ export const updateAReservedStock = async (
         const reservedStock = await updateReservedStock(reserveDto);  
 
         res.status(200).json(reservedStock);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(418).json({ message: error.message });
+        }
+    }
+}
+
+export const useAReservedStock = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const reservedStockId = +req.params.id;
+
+        const quantity = req.body;
+
+        useReservedStock(reservedStockId, quantity);  
+
+        res.status(200).json({ message: 'Reserved stock used successfully' });
     } catch (error) {
         if (error instanceof Error) {
             res.status(418).json({ message: error.message });
