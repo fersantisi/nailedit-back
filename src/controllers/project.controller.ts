@@ -5,6 +5,7 @@ import {
   deleteProject,
   getProject,
   getProjectsByUserIdService,
+  searchProjects,
   updateProject,
 } from '../services/project.service';
 import { validateOrReject } from 'class-validator';
@@ -154,3 +155,17 @@ export const updateAProject = async(req: Request, res: Response):Promise<void>=>
     } 
   }
 }
+
+export const searchProjectsCommunity = async (req: Request, res: Response) => {
+  const q = req.query.q?.toString() || '';
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+
+  try {
+    const result = await searchProjects(q, page, limit);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error searching projects:', error);
+    res.status(500).json({ message: 'Error searching projects' });
+  }
+};

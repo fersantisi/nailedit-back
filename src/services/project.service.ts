@@ -3,6 +3,7 @@ import Project from '../database/models/Project';
 
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 import { ProjectDto } from '../dtos/ProjectDto';
+import { Op } from 'sequelize';
 
 export const createProject = async (project: ProjectDto) => {
 
@@ -162,3 +163,28 @@ export const getAllProjects = async (): Promise<ProjectDto[]> => {
     throw new Error('Server error, check server console for more information');
   }
 }
+
+export const searchProjects = async (
+  query: string,
+  page: number = 1,
+  limit: number = 10
+) => {
+  const offset = (page - 1) * limit;
+
+  const { count, rows } = await Project.findAndCountAll({
+    where: {
+      name: {
+        [Op.iLike]: `%${query}%`,
+      },
+    },
+    offset,
+    limit,
+  });
+
+  return {
+    total: count,
+    page,
+    totalPages: Math.ceil(count / limit),
+    results: rows,
+  };
+};
