@@ -199,17 +199,52 @@ export const updateUserPasswordWithValidation = async (
       currentPassword,
       user.password,
     );
+
     if (!isCurrentPasswordValid) {
       return false;
     }
 
     // Hash new password
     const hashedNewPassword = bcrypt.hashSync(newPassword, 10);
-
-    // Update password
     user.password = hashedNewPassword;
-    await user.save();
 
+    await user.save();
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateUserProfile = async (
+  userId: string,
+  username: string,
+  email: string,
+): Promise<boolean> => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return false;
+    }
+
+    // Check if email or username already exists for other users
+    const { Op } = require('sequelize');
+    const existingUser = await User.findOne({
+      where: {
+        [Op.and]: [
+          { [Op.or]: [{ email }, { username }] },
+          { id: { [Op.ne]: userId } },
+        ],
+      },
+    });
+
+    if (existingUser) {
+      return false; // Email or username already exists
+    }
+
+    user.username = username;
+    user.email = email;
+
+    await user.save();
     return true;
   } catch (error) {
     throw error;

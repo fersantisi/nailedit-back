@@ -21,26 +21,27 @@ export const createNewTask = async (
   try {
     const goalIdSTR = req.params.goalId;
     const goalIdNumber = +goalIdSTR;
-    
 
     const { name, description, label, dueDate } = req.body;
 
     console.log(dueDate);
 
-    // Validate that task due date is not later than goal due date
-    const isDueDateValid = await validateTaskDueDate(goalIdNumber, dueDate);
-    if (!isDueDateValid) {
-      res.status(400).json({
-        message: 'Task due date cannot be later than the goal due date',
-      });
-      return;
+    // Validate that task due date is not later than goal due date only if dueDate is provided
+    if (dueDate) {
+      const isDueDateValid = await validateTaskDueDate(goalIdNumber, dueDate);
+      if (!isDueDateValid) {
+        res.status(400).json({
+          message: 'Task due date cannot be later than the goal due date',
+        });
+        return;
+      }
     }
 
     const task: TaskDto = new TaskDto(
       name,
-      description,
-      label,
-      dueDate,
+      description || '',
+      label || '',
+      dueDate || '',
       goalIdNumber,
     );
 
@@ -130,7 +131,7 @@ export const updateATask = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { name, description, category, dueDate } = req.body;
+    const { name, description, label, dueDate } = req.body;
     const taskIdStr = req.params.taskId;
     const taskIdNumber = +taskIdStr;
 
@@ -144,20 +145,22 @@ export const updateATask = async (
     // Get the goal ID from the task
     const goalId = task.goalId;
 
-    // Validate that task due date is not later than goal due date
-    const isDueDateValid = await validateTaskDueDate(goalId, dueDate);
-    if (!isDueDateValid) {
-      res.status(400).json({
-        message: 'Task due date cannot be later than the goal due date',
-      });
-      return;
+    // Validate that task due date is not later than goal due date only if dueDate is provided
+    if (dueDate) {
+      const isDueDateValid = await validateTaskDueDate(goalId, dueDate);
+      if (!isDueDateValid) {
+        res.status(400).json({
+          message: 'Task due date cannot be later than the goal due date',
+        });
+        return;
+      }
     }
 
     const taskUpdate: UpdateTaskDto = new UpdateTaskDto(
       name,
-      description,
-      category,
-      dueDate,
+      description || '',
+      label || '',
+      dueDate || '',
       taskIdNumber,
     );
 
@@ -166,7 +169,7 @@ export const updateATask = async (
     await updateTask(taskUpdate);
 
     res.status(201).json({
-      message: 'Task updated'
+      message: 'Task updated',
     });
   } catch (error: unknown) {
     console.log(error);

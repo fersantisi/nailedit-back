@@ -28,6 +28,9 @@ export const validateTaskDueDate = async (
   taskDueDate: string,
 ): Promise<boolean> => {
   try {
+    if (taskDueDate == undefined) {
+      return true;
+    }
     const goal = await Goal.findByPk(goalId);
     if (!goal) {
       throw new Error('Goal not found');

@@ -38,16 +38,19 @@ class Task extends Model {
 
   @Column({
     type: DataType.STRING,
+    allowNull: true,
   })
   declare description: string;
 
   @Column({
     type: DataType.STRING,
+    allowNull: true,
   })
   declare label: string;
 
   @Column({
     type: DataType.STRING,
+    allowNull: true,
   })
   declare dueDate: string;
 

@@ -18,9 +18,9 @@ export const createTask = async (task: TaskDto) => {
 
     const newTask = await Task.create({
       name: task.name,
-      description: task.description,
-      label: task.label,
-      dueDate: task.dueDate,
+      description: task.description ?? null,
+      label: task.label ?? null,
+      dueDate: task.dueDate ?? null,
       goalId: task.goalId,
     });
   } catch (error) {
