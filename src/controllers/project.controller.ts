@@ -5,6 +5,7 @@ import {
   deleteProject,
   getProject,
   getProjectsByUserIdService,
+  getSharedProjects,
   searchProjects,
   updateProject,
 } from '../services/project.service';
@@ -169,3 +170,17 @@ export const searchProjectsCommunity = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error searching projects' });
   }
 };
+
+export const getAllSharedProjects = async (req: Request, res: Response) => {
+  const userId = await getTokenPayload(req.cookies.authToken).userId;
+
+  try {
+    const sharedProjects = await getSharedProjects(userId);
+    
+    res.status(200).json(sharedProjects);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(418).json({ message: error.message });
+    }
+  }
+}

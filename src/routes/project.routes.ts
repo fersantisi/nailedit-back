@@ -9,15 +9,17 @@ import {
 import { createNewGoal, deleteAGoal, getAGoal, getGoalsByProjectId, updateAGoal} from '../controllers/goal.controller';
 import { createNewTask, deleteATask, getATask, getTasksByGoalId, updateATask} from '../controllers/task.controller';
 import { acceptAParticipationRequest, getAllParticipationRequests, getAllProjectParticipants, rejectAParticipationRequest, removeAParticipant } from '../controllers/community.controller';
+import { checkOwnership } from '../middlewares/checkOwnership';
 
 
 const router = Router();
 router.post('/create', createNewProject);
-router.delete('/delete/:id', deleteAProject);
+router.delete('/delete/:id',checkOwnership, deleteAProject);
 router.get('/list', getProjectsByUserId);
 router.put('/:projectId/updateProject', updateAProject)
 router.get('/:projectId', getAProject);
 
+//comunity DLC
 router.get('/:projectId/participants', getAllProjectParticipants);
 router.get('/:projectId/participantsRequests', getAllParticipationRequests);
 router.post('/:projectId/participantionRequest/:requestId/accept', acceptAParticipationRequest);
@@ -30,14 +32,14 @@ router.get('/:id/stock',getAllProjectStock);
 
 
 router.post('/:projectId/createGoal', createNewGoal )
-router.delete('/:projectId/goal/:goalId', deleteAGoal)
+router.delete('/:projectId/goal/:goalId',checkOwnership, deleteAGoal)
 router.get('/:projectId/goal/:goalId',getAGoal)
 router.get('/:projectId/goals', getGoalsByProjectId);
 router.put('/:projectId/goal/:goalId/updateGoal', updateAGoal)
 
 router.post('/:projectId/goal/:goalId/createTask', createNewTask)
 router.get('/:projectId/goal/:goalId/task/:taskId', getATask)
-router.delete('/:projectId/goal/:goalId/task/:taskId', deleteATask)
+router.delete('/:projectId/goal/:goalId/task/:taskId',checkOwnership, deleteATask)
 router.get('/:projectId/goal/:goalId/tasks', getTasksByGoalId);
 router.put('/:projectId/goal/:goalId/task/:taskId/updateTask', updateATask)
 

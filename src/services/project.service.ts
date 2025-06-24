@@ -4,6 +4,7 @@ import Project from '../database/models/Project';
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 import { ProjectDto } from '../dtos/ProjectDto';
 import { Op } from 'sequelize';
+import ProjectParticipant from '../database/models/ProjectParticipant';
 
 export const createProject = async (project: ProjectDto) => {
 
@@ -188,3 +189,34 @@ export const searchProjects = async (
     results: rows,
   };
 };
+
+export const getSharedProjects = async (userId: number): Promise<ProjectDto[]> => {
+  try {
+    const sharedProjects = await ProjectParticipant.findAll({
+      where: { userId }, 
+    });
+    const projectIds = sharedProjects.map(participant => participant.projectId);
+    const projects = await Project.findAll({
+      where: { id: projectIds },
+    });
+    const projectDTOs: ProjectDto[] = projects.map((project) => {
+      return new ProjectDto(
+        project.id,
+        project.userid,
+        project.name,
+        project.description,
+        project.category,
+        project.image,
+        project.duedate,
+        project.created_at,
+        project.updated_at,
+      );
+    });
+    return projectDTOs;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error('Server error, check server console for more information');
+  }
+}
