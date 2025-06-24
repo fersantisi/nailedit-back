@@ -8,6 +8,7 @@ import {
 } from '../controllers/project.controller';
 import { createNewGoal, deleteAGoal, getAGoal, getGoalsByProjectId, updateAGoal} from '../controllers/goal.controller';
 import { createNewTask, deleteATask, getATask, getTasksByGoalId, updateATask} from '../controllers/task.controller';
+import { getAllstock } from '../controllers/stock.controller';
 
 
 const router = Router();
@@ -18,7 +19,7 @@ router.put('/:projectId/updateProject', updateAProject)
 router.get('/:projectId', getAProject);
 
 //get proyect reserved stock
-router.get('/:id/stock',getAllProjectStock);
+router.get('/:id/stock',getAllstock);
 
 
 router.post('/:projectId/createGoal', createNewGoal )
