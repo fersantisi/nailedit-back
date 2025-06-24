@@ -2,50 +2,63 @@ import { Request, Response } from 'express';
 import { NoteDataDto } from '../dtos/NoteDataDto';
 import { validateOrReject } from 'class-validator';
 import { NoteDto } from '../dtos/NoteDto';
-import { createNote, deleteNote, getNote, getNoteByGoalIdService, getNoteByProjectIdService, getNoteByTaskIdService, updateNote } from '../services/note.service';
+import {
+  createNote,
+  deleteNote,
+  getNote,
+  getNoteByGoalIdService,
+  getNoteByProjectIdService,
+  getNoteByTaskIdService,
+  updateNote,
+} from '../services/note.service';
 
 export const createNewNote = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-    const projectIdSTR = req.params.projectId
-    const projectIdNumber = +projectIdSTR
+    console.log('req.params:', req.params);
+    const projectIdNumber = req.params.projectId
+      ? +req.params.projectId
+      : undefined;
+    const goalIdNumber = req.params.goalId ? +req.params.goalId : undefined;
+    const taskIdNumber = req.params.taskId ? +req.params.taskId : undefined;
+    console.log(
+      'projectIdNumber:',
+      projectIdNumber,
+      'goalIdNumber:',
+      goalIdNumber,
+      'taskIdNumber:',
+      taskIdNumber,
+    );
 
-    const goalIdSTR = req.params.goalId
-    const goalIdNumber = +goalIdSTR
-
-    const taskIdSTR = req.params.taskId
-    const taskIdNumber = +taskIdSTR
-
-    const { name, description} = req.body;
-    
+    const { name, description } = req.body;
     let note;
 
-    if (!isNaN(taskIdNumber)) {
+    if (typeof taskIdNumber === 'number' && !isNaN(taskIdNumber)) {
       note = new NoteDto({
         name,
         description,
         taskId: taskIdNumber,
       });
-    } else if (!isNaN(goalIdNumber)) {
+    } else if (typeof goalIdNumber === 'number' && !isNaN(goalIdNumber)) {
       note = new NoteDto({
         name,
         description,
         goalId: goalIdNumber,
       });
-    } else {
+    } else if (typeof projectIdNumber === 'number' && !isNaN(projectIdNumber)) {
       note = new NoteDto({
         name,
         description,
         projectId: projectIdNumber,
       });
-    } 
-    
-
+    } else {
+      res.status(400).json({ message: 'No valid parent ID provided' });
+      return;
+    }
 
     await validateOrReject(note);
-
     await createNote(note);
 
     res.status(201).json({
@@ -87,12 +100,9 @@ export const deleteANote = async (
   }
 };
 
-export const getANote = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const getANote = async (req: Request, res: Response): Promise<void> => {
   try {
-    const noteId = req.params.id;
+    const noteId = req.params.noteId;
     const note: NoteDataDto = await getNote(noteId);
 
     res.status(201).json(note);
@@ -108,25 +118,25 @@ export const getAllObjectNotes = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const projectIdSTR = req.params.projectId
-    const projectIdNumber = +projectIdSTR
+    const projectIdNumber = req.params.projectId
+      ? +req.params.projectId
+      : undefined;
+    const goalIdNumber = req.params.goalId ? +req.params.goalId : undefined;
+    const taskIdNumber = req.params.taskId ? +req.params.taskId : undefined;
 
-    const goalIdSTR = req.params.goalId
-    const goalIdNumber = +goalIdSTR
-
-    const taskIdSTR = req.params.taskId
-    const taskIdNumber = +taskIdSTR
-    
     let notes;
 
-    if (!isNaN(taskIdNumber)) {
-      const notes: NoteDataDto[] = await getNoteByTaskIdService(taskIdNumber);
-    } else if (!isNaN(goalIdNumber)) {
-      const notes: NoteDataDto[] = await getNoteByGoalIdService(goalIdNumber);
+    if (typeof taskIdNumber === 'number' && !isNaN(taskIdNumber)) {
+      notes = await getNoteByTaskIdService(taskIdNumber);
+    } else if (typeof goalIdNumber === 'number' && !isNaN(goalIdNumber)) {
+      notes = await getNoteByGoalIdService(goalIdNumber);
+    } else if (typeof projectIdNumber === 'number' && !isNaN(projectIdNumber)) {
+      notes = await getNoteByProjectIdService(projectIdNumber);
     } else {
-      const notes: NoteDataDto[] = await getNoteByProjectIdService(projectIdNumber);
-    } 
-    
+      res.status(400).json({ message: 'No valid parent ID provided' });
+      return;
+    }
+
     res.status(200).json(notes);
   } catch (error) {
     if (error instanceof Error) {
@@ -135,19 +145,22 @@ export const getAllObjectNotes = async (
   }
 };
 
-export const updateANote = async(req: Request, res: Response):Promise<void>=> {
-  try{
-    const projectIdSTR = req.params.projectId
-    const projectIdNumber = +projectIdSTR
+export const updateANote = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectIdSTR = req.params.projectId;
+    const projectIdNumber = +projectIdSTR;
 
-    const goalIdSTR = req.params.goalId
-    const goalIdNumber = +goalIdSTR
+    const goalIdSTR = req.params.goalId;
+    const goalIdNumber = +goalIdSTR;
 
-    const taskIdSTR = req.params.taskId
-    const taskIdNumber = +taskIdSTR
+    const taskIdSTR = req.params.taskId;
+    const taskIdNumber = +taskIdSTR;
 
-    const { noteId, name, description} = req.body;
-    
+    const { noteId, name, description } = req.body;
+
     let note;
 
     if (!isNaN(taskIdNumber)) {
@@ -168,7 +181,7 @@ export const updateANote = async(req: Request, res: Response):Promise<void>=> {
         description,
         projectId: projectIdNumber,
       });
-    } 
+    }
     await validateOrReject(note);
 
     await updateNote(note, noteId);
@@ -190,6 +203,6 @@ export const updateANote = async(req: Request, res: Response):Promise<void>=> {
       res.status(500).json({ message: error.message });
     } else {
       res.status(500).json({ message: 'Unknown error' });
-    } 
+    }
   }
-}
+};

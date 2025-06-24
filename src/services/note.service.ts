@@ -11,9 +11,9 @@ export const createNote = async (note: NoteDto) => {
     const newNote = await Note.create({
       name: note.name,
       description: note.description,
-      projectId: note.projectId,
-      goalId: note.goalId,
-      taskId: note.taskId,
+      projectid: note.projectId,
+      goalid: note.goalId,
+      taskid: note.taskId,
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -22,6 +22,7 @@ export const createNote = async (note: NoteDto) => {
     }
   }
 };
+
 export const deleteNote = async (noteId: string) => {
   try {
     const note = await Note.findByPk(noteId);
@@ -50,8 +51,8 @@ export const getNote = async (noteId: string): Promise<NoteDataDto> => {
       note.projectid,
       note.goalid,
       note.taskid,
-      note.createdAt,
-      note.updatedAt,
+      note.created_at,
+      note.updated_at,
     );
 
     return noteDTO;
@@ -66,7 +67,7 @@ export const getNote = async (noteId: string): Promise<NoteDataDto> => {
 export const updateNote = async (newData: NoteDto, noteId: number) => {
   const note = await Note.findByPk(noteId);
 
-  if (!note) { 
+  if (!note) {
     throw Error('Note not found');
   }
   note.name = newData.name;
@@ -81,7 +82,6 @@ export const getNoteByGoalIdService = async (
   goalId: number,
 ): Promise<NoteDataDto[]> => {
   try {
-    
     if (isNaN(goalId)) {
       throw new Error('Invalid goalId: must be a valid number');
     }
@@ -98,8 +98,8 @@ export const getNoteByGoalIdService = async (
         note.projectid,
         note.goalid,
         note.taskid,
-        note.createdAt,
-        note.updatedAt,
+        note.created_at,
+        note.updated_at,
       );
     });
 
@@ -116,13 +116,12 @@ export const getNoteByProjectIdService = async (
   projectId: number,
 ): Promise<NoteDataDto[]> => {
   try {
-    
     if (isNaN(projectId)) {
       throw new Error('Invalid projectId: must be a valid number');
     }
 
     const notes = await Note.findAll({
-      where: { projectId: projectId },
+      where: { projectid: projectId },
     });
 
     const noteDTOs: NoteDataDto[] = notes.map((note) => {
@@ -133,8 +132,8 @@ export const getNoteByProjectIdService = async (
         note.projectid,
         note.goalid,
         note.taskid,
-        note.createdAt,
-        note.updatedAt,
+        note.created_at,
+        note.updated_at,
       );
     });
 
@@ -151,13 +150,12 @@ export const getNoteByTaskIdService = async (
   taskId: number,
 ): Promise<NoteDataDto[]> => {
   try {
-    
     if (isNaN(taskId)) {
       throw new Error('Invalid taskId: must be a valid number');
     }
 
     const notes = await Note.findAll({
-      where: { taskId: taskId },
+      where: { taskid: taskId },
     });
 
     const noteDTOs: NoteDataDto[] = notes.map((note) => {
@@ -168,8 +166,8 @@ export const getNoteByTaskIdService = async (
         note.projectid,
         note.goalid,
         note.taskid,
-        note.createdAt,
-        note.updatedAt,
+        note.created_at,
+        note.updated_at,
       );
     });
 
