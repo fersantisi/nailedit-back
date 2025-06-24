@@ -7,8 +7,10 @@ import {
   CreatedAt,
   UpdatedAt,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
 import Goal from './Goal';
+import Note from './Note';
 
 @Table({
   timestamps: true,
@@ -59,6 +61,9 @@ class Task extends Model {
     onDelete: 'CASCADE',
   })
   declare goal: Goal;
+
+  @HasMany(() => Note)
+  declare note: Note[];
 }
 
 export default Task;

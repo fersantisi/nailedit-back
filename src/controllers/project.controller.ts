@@ -123,6 +123,7 @@ export const updateAProject = async (
 ): Promise<void> => {
   try {
     const { name, description, category, image, dueDate } = req.body;
+
     const projectIdStr = req.params.projectId;
     const projectIdNumber = +projectIdStr;
 

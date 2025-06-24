@@ -21,6 +21,7 @@ export const createNewTask = async (
   try {
     const goalIdSTR = req.params.goalId;
     const goalIdNumber = +goalIdSTR;
+    
 
     const { name, description, label, dueDate } = req.body;
 
@@ -165,7 +166,7 @@ export const updateATask = async (
     await updateTask(taskUpdate);
 
     res.status(201).json({
-      message: 'Task updated',
+      message: 'Task updated'
     });
   } catch (error: unknown) {
     console.log(error);

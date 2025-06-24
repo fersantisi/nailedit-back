@@ -22,11 +22,10 @@ export const createProject = async (project: ProjectDto) => {
       dueDate: project.dueDate,
       userId: project.userId,
     });
-    console.log(newProject);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
-      throw new Error('Project name already in use.');
+      throw new Error(error.message);
     }
   }
 };
@@ -37,7 +36,6 @@ export const deleteProject = async (projectId: string) => {
     if (!project) {
       throw new Error('Project not found');
     }
-
     await project.destroy();
   } catch (error) {
     if (error instanceof Error) {
