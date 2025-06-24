@@ -194,7 +194,9 @@ export const getAllTasksController = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const tasks = await getAllTasks();
+    // Get userId from req.user (set by auth middleware)
+    const userId = (req as any).user?.id;
+    const tasks = await getAllTasks(userId);
 
     // Transform the response to match frontend expectations
     const transformedTasks = tasks.map((task) => ({
@@ -205,6 +207,8 @@ export const getAllTasksController = async (
       description: task.description,
       label: task.label,
       dueDate: task.dueDate,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
     }));
 
     res.status(200).json(transformedTasks);

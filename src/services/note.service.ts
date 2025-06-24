@@ -67,7 +67,7 @@ export const getNote = async (noteId: string): Promise<NoteDataDto> => {
 export const updateNote = async (newData: NoteDto, noteId: number) => {
   const note = await Note.findByPk(noteId);
 
-  if (!note) {
+  if (!note) { 
     throw Error('Note not found');
   }
   note.name = newData.name;

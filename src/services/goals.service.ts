@@ -124,13 +124,15 @@ export const getGoalWithProjectId = async (goalId: string) => {
   }
 };
 
-export const getAllGoals = async (): Promise<any[]> => {
+export const getAllGoals = async (userId?: number): Promise<any[]> => {
   try {
     const goals = await Goal.findAll({
       include: [
         {
           model: Project,
           as: 'project',
+          where: userId ? { userId } : undefined,
+          required: true,
         },
       ],
     });

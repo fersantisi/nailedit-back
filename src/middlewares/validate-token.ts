@@ -17,10 +17,13 @@ export const validateToken = (
         authToken,
         process.env.SECRET_KEY || '123',
       );
-
+      const payload = getTokenPayload(authToken);
+      (req as any).user = { id: payload.userId };
       next();
     } catch (error) {
       if (refreshSession(authToken, refreshToken, req, res)) {
+        const payload = getTokenPayload(authToken);
+        (req as any).user = { id: payload.userId };
         next();
       } else {
         res.status(401).json({ message: 'Acces Denied.' });

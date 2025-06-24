@@ -121,17 +121,20 @@ export const updateTask = async (newData: UpdateTaskDto) => {
   await task.save();
 };
 
-export const getAllTasks = async (): Promise<any[]> => {
+export const getAllTasks = async (userId?: number): Promise<any[]> => {
   try {
     const tasks = await Task.findAll({
       include: [
         {
           model: Goal,
           as: 'goal',
+          required: true,
           include: [
             {
               model: Project,
               as: 'project',
+              where: userId ? { userId } : undefined,
+              required: true,
             },
           ],
         },

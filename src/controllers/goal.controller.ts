@@ -189,7 +189,9 @@ export const getAllGoalsController = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const goals = await getAllGoals();
+    // Get userId from req.user (set by auth middleware)
+    const userId = (req as any).user?.id;
+    const goals = await getAllGoals(userId);
 
     // Transform the response to match frontend expectations
     const transformedGoals = goals.map((goal) => ({
@@ -198,6 +200,8 @@ export const getAllGoalsController = async (
       name: goal.name,
       description: goal.description,
       dueDate: goal.dueDate,
+      createdAt: goal.createdAt,
+      updatedAt: goal.updatedAt,
     }));
 
     res.status(200).json(transformedGoals);
