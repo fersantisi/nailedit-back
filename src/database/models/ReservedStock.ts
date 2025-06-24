@@ -1,13 +1,13 @@
 import { Table, Column, DataType, Model, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import User from "./User"
 import Project from './Project';
+import Stock from './Stock';
 
 @Table({
   timestamps: false,
-  tableName: 'stock',
-  modelName: 'Stock',
+  tableName: 'reservedstock',
+  modelName: 'ReservedStock',
 })
-class Stock extends Model {
+class ReservedStock extends Model {
   @Column({
     primaryKey: true,
     type: DataType.INTEGER,
@@ -15,43 +15,32 @@ class Stock extends Model {
   })
   declare id: number;
 
+  @ForeignKey(() => Stock)
   @Column({
-    type: DataType.STRING,
+    type: DataType.INTEGER,
   })
-  declare itemName: string;
+  declare stockId: number;
+
+  @ForeignKey(() => Project)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare projectId: number;
 
   @Column({
     type: DataType.DOUBLE,
   })
   declare quantity: number;
 
-  @Column({
-    type: DataType.STRING,
-  })
-  declare unit: string;
-
-  @Column({
-    type: DataType.DOUBLE,
-  })
-  declare reserved: number;
-
-  @ForeignKey(() => User)
-  @Column({
-    type: DataType.INTEGER,
-  })
-  declare userid: number;
-
   @BelongsTo(()=>Stock, {
     onDelete: 'CASCADE',
   })
+  declare stock: Stock;
 
   @BelongsTo(()=>Project,{})
-  
-
-  
   declare project: Project;
 }
 
 
 
-export default Stock
+export default ReservedStock

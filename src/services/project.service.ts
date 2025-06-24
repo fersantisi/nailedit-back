@@ -1,8 +1,8 @@
 import { error } from 'console';
 import Project from '../database/models/Project';
-import { ProjectDto } from '../dtos/ProjectDto';
-import { ProjectDataDto } from '../dtos/ProjectDataDto';
+
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
+import { ProjectDto } from '../dtos/ProjectDto';
 
 export const createProject = async (project: ProjectDto) => {
 
@@ -48,15 +48,16 @@ export const deleteProject = async (projectId: string) => {
   }
 };
 
-export const getProject = async (projectIdNumber: number): Promise<ProjectDataDto> => {
+export const getProject = async (projectIdNumber: number): Promise<ProjectDto> => {
   try {
     const project = await Project.findByPk(projectIdNumber);
     if (!project) {
       throw new Error('Project not found');
     }
 
-    const projectDTO: ProjectDataDto = new ProjectDataDto(
+    const projectDTO: ProjectDto = new ProjectDto(
       project.id,
+      project.userid,
       project.name,
       project.description,
       project.category,
@@ -65,6 +66,8 @@ export const getProject = async (projectIdNumber: number): Promise<ProjectDataDt
       project.created_at,
       project.updated_at,
     );
+
+    
 
     return projectDTO;
   } catch (error) {
@@ -77,15 +80,16 @@ export const getProject = async (projectIdNumber: number): Promise<ProjectDataDt
 
 export const getProjectsByUserIdService = async (
   userId: number,
-): Promise<ProjectDataDto[]> => {
+): Promise<ProjectDto[]> => {
   try {
     const projects = await Project.findAll({
       where: { userid: userId },
     });
 
-    const projectDTOs: ProjectDataDto[] = projects.map((project) => {
-      return new ProjectDataDto(
+    const projectDTOs: ProjectDto[] = projects.map((project) => {
+      return new ProjectDto(
         project.id,
+        project.userid,
         project.name,
         project.description,
         project.category,

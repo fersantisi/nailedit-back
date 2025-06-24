@@ -1,17 +1,15 @@
 import { Request, Response } from 'express';
-import { ProjectDto } from '../dtos/ProjectDto';
 import { getTokenPayload } from '../services/token.service';
 import {
   createProject,
   deleteProject,
   getProject,
-  getProjectByIdService,
   getProjectsByUserIdService,
   updateProject,
 } from '../services/project.service';
-import { ProjectDataDto } from '../dtos/ProjectDataDto';
 import { validateOrReject } from 'class-validator';
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
+import { ProjectDto } from '../dtos/ProjectDto';
 
 export const createNewProject = async (
   req: Request,
@@ -22,19 +20,20 @@ export const createNewProject = async (
 
     const { name, description, category, image, dueDate } = req.body;
 
-    console.log(dueDate);
-    
 
     const project: ProjectDto = new ProjectDto(
+      0,
+      userId,
       name,
       description,
       category,
       image,
       dueDate,
-      userId,
+      null,
+      null,
+      
     );
 
-    console.log(project);
 
     await validateOrReject(project);
 
@@ -86,12 +85,9 @@ export const getAProject = async (
   try {
     const projectId = req.params.projectId;
     const projectIdNumber = +projectId;
-
-    console.log(projectId);
     
 
-    const project: ProjectDataDto = await getProject(projectIdNumber);
-    console.log(project);
+    const project: ProjectDto = await getProject(projectIdNumber);
     
     res.status(201).json(project);
     
@@ -108,7 +104,7 @@ export const getProjectsByUserId = async (
 ): Promise<void> => {
   try {
     const userId = await getTokenPayload(req.cookies.authToken).userId;
-    const projects: ProjectDataDto[] = await getProjectsByUserIdService(userId);
+    const projects: ProjectDto[] = await getProjectsByUserIdService(userId);
     console.log(projects);
     
     res.status(200).json(projects);
