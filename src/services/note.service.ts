@@ -29,7 +29,7 @@ export const deleteNote = async (noteId: string) => {
     if (!note) {
       throw new Error('Note not found');
     }
-    await Note.destroy();
+    await note.destroy();
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);

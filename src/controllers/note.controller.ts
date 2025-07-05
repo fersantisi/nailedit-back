@@ -87,7 +87,7 @@ export const deleteANote = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const noteId = req.params.id;
+    const noteId = req.params.noteId;
     console.log(noteId);
     await deleteNote(noteId);
     res.status(200).json({
