@@ -24,7 +24,7 @@ export const getAllProjectReservedStock = async (
     }
 }
 
-export const getAllstock = async (
+export const getAllStock = async (
     req: Request,
     res: Response,
     ): Promise<void> => {
