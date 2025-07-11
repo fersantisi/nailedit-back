@@ -1,6 +1,16 @@
-import { Table, Column, DataType, Model, ForeignKey, CreatedAt, UpdatedAt, BelongsTo } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  ForeignKey,
+  CreatedAt,
+  UpdatedAt,
+  BelongsTo,
+  HasMany,
+} from 'sequelize-typescript';
 import Goal from './Goal';
-
+import Note from './Note';
 
 @Table({
   timestamps: true,
@@ -19,7 +29,7 @@ class Task extends Model {
   @Column({
     type: DataType.INTEGER,
   })
-  declare goalid: number;
+  declare goalId: number;
 
   @Column({
     type: DataType.STRING,
@@ -28,18 +38,27 @@ class Task extends Model {
 
   @Column({
     type: DataType.STRING,
+    allowNull: true,
   })
   declare description: string;
-  
+
   @Column({
     type: DataType.STRING,
+    allowNull: true,
   })
   declare label: string;
 
   @Column({
     type: DataType.STRING,
+    allowNull: true,
   })
-  declare duedate: string;
+  declare dueDate: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  declare completed: boolean;
 
   @CreatedAt
   declare created_at: Date;
@@ -47,12 +66,13 @@ class Task extends Model {
   @UpdatedAt
   declare updated_at: Date;
 
-  @BelongsTo(()=>Goal, {
+  @BelongsTo(() => Goal, {
     onDelete: 'CASCADE',
   })
   declare goal: Goal;
+
+  @HasMany(() => Note)
+  declare note: Note[];
 }
 
-
-
-export default Task
+export default Task;

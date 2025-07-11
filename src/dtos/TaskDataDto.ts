@@ -1,19 +1,19 @@
 import {
-    IsDate,
+  IsDate,
   IsDateString,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  IsBoolean,
 } from 'class-validator';
 
 export class TaskDataDto {
-
   @IsNumber()
   declare id: number;
 
   @IsNumber()
-  declare goalid: number;
+  declare goalId: number;
 
   @IsString()
   @IsNotEmpty({ message: 'Name is requiered' })
@@ -27,10 +27,9 @@ export class TaskDataDto {
   @IsString()
   declare label: string;
 
-
   @IsOptional()
   @IsDateString()
-  declare duedate: string;
+  declare dueDate: string;
 
   @IsNotEmpty()
   @IsDateString()
@@ -40,23 +39,29 @@ export class TaskDataDto {
   @IsDate()
   declare updatedDate: Date;
 
+  @IsNotEmpty()
+  @IsBoolean()
+  declare completed: boolean;
+
   constructor(
     taskId: number,
     goalId: number,
     name: string,
     description: string,
     label: string,
-    duedate: string,
+    dueDate: string,
     creationDate: Date,
     updatedDate: Date,
+    completed: boolean,
   ) {
     this.id = taskId;
-    this.goalid = goalId;
+    this.goalId = goalId;
     this.name = name;
     this.description = description;
     this.label = label;
-    this.duedate = duedate;
+    this.dueDate = dueDate;
     this.creationDate = creationDate;
     this.updatedDate = updatedDate;
+    this.completed = completed;
   }
 }

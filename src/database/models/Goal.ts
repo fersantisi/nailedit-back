@@ -1,6 +1,18 @@
-import { Table, Column, DataType, Model, ForeignKey, CreatedAt, UpdatedAt, BelongsTo } from 'sequelize-typescript';
-import User from "./User"
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  ForeignKey,
+  CreatedAt,
+  UpdatedAt,
+  BelongsTo,
+  HasMany,
+} from 'sequelize-typescript';
+import User from './User';
 import Project from './Project';
+import Note from './Note';
+import Task from './Task';
 
 @Table({
   timestamps: true,
@@ -19,7 +31,7 @@ class Goal extends Model {
   @Column({
     type: DataType.INTEGER,
   })
-  declare projectid: number;
+  declare projectId: number;
 
   @Column({
     type: DataType.STRING,
@@ -34,7 +46,13 @@ class Goal extends Model {
   @Column({
     type: DataType.STRING,
   })
-  declare duedate: string;
+  declare dueDate: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  declare completed: boolean;
 
   @CreatedAt
   declare created_at: Date;
@@ -42,12 +60,16 @@ class Goal extends Model {
   @UpdatedAt
   declare updated_at: Date;
 
-  @BelongsTo(()=>Project, {
+  @BelongsTo(() => Project, {
     onDelete: 'CASCADE',
   })
   declare project: Project;
+
+  @HasMany(() => Note)
+  declare note: Note[];
+
+  @HasMany(() => Task)
+  declare task: Task[];
 }
 
-
-
-export default Goal
+export default Goal;
