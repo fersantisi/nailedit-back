@@ -3,6 +3,7 @@ import Project from '../database/models/Project';
 
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 import { ProjectDto } from '../dtos/ProjectDto';
+import { ProjectDataDto } from '../dtos/ProjectDataDto';
 
 export const createProject = async (project: ProjectDto) => {
   try {
@@ -53,9 +54,8 @@ export const getProject = async (
       throw new Error('Project not found');
     }
 
-    const projectDTO: ProjectDto = new ProjectDto(
+    const projectDataDTO: ProjectDataDto = new ProjectDataDto(
       project.id,
-      project.userid,
       project.name,
       project.description,
       project.category,
@@ -65,9 +65,7 @@ export const getProject = async (
       project.updated_at,
     );
 
-    
-
-    return projectDTO;
+    return projectDataDTO;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
@@ -78,16 +76,15 @@ export const getProject = async (
 
 export const getProjectsByUserIdService = async (
   userId: number,
-): Promise<ProjectDto[]> => {
+): Promise<ProjectDataDto[]> => {
   try {
     const projects = await Project.findAll({
       where: { userId: userId },
     });
 
-    const projectDTOs: ProjectDto[] = projects.map((project) => {
-      return new ProjectDto(
+    const projectDataDTOs: ProjectDataDto[] = projects.map((project) => {
+      return new ProjectDataDto(
         project.id,
-        project.userid,
         project.name,
         project.description,
         project.category,
@@ -98,7 +95,7 @@ export const getProjectsByUserIdService = async (
       );
     });
 
-    return projectDTOs;
+    return projectDataDTOs;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);

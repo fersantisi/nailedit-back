@@ -11,6 +11,7 @@ import { validateOrReject } from 'class-validator';
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 import { validateProjectDueDateUpdate } from '../utils/validateDueDate';
 import { ProjectDto } from '../dtos/ProjectDto';
+import { ProjectDataDto } from '../dtos/ProjectDataDto';
 
 export const createNewProject = async (
   req: Request,
@@ -24,18 +25,13 @@ export const createNewProject = async (
     console.log(dueDate);
 
     const project: ProjectDto = new ProjectDto(
-      0,
-      userId,
       name,
       description,
       category,
       image,
       dueDate,
-      null,
-      null,
-      
+      userId,
     );
-
 
     await validateOrReject(project);
 
@@ -107,7 +103,7 @@ export const getProjectsByUserId = async (
 ): Promise<void> => {
   try {
     const userId = await getTokenPayload(req.cookies.authToken).userId;
-    const projects: ProjectDto[] = await getProjectsByUserIdService(userId);
+    const projects: ProjectDataDto[] = await getProjectsByUserIdService(userId);
     console.log(projects);
 
     res.status(200).json(projects);
