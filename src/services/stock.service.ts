@@ -94,7 +94,7 @@ export const getAllProjectStock = async (
   ): Promise<ReserveStockDto[]> => {
     try {
       const reservedStock = await ReservedStock.findAll({
-        where: { projectid: projectId },
+        where: { projectId: projectId },
       });
       const reservedStockDTOs: ReserveStockDto[] = reservedStock.map((reserved) => {
         return new ReserveStockDto(

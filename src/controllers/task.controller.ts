@@ -85,7 +85,7 @@ export const deleteATask = async (
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
@@ -97,7 +97,7 @@ export const getATask = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({ ...task, completed: task.completed });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
@@ -121,7 +121,7 @@ export const getTasksByGoalId = async (
       .json(tasks.map((task) => ({ ...task, completed: task.completed })));
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 };

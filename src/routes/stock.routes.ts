@@ -22,7 +22,7 @@ router.delete('/:id', deleteAStock); // Delete stock item
 // Reserved stock routes
 router.get('/projects/:id/reserved', getAllProjectReservedStock); // Get project's reserved stock
 router.post('/:id/reserve/:projectId', createAReservedStock); // Reserve stock for project
-router.delete('/:id/reserve/:projectId', deleteAReservedStock); // Unreserve stock from project
+router.delete('/reserved/:id', deleteAReservedStock); // Delete reserved stock by reservedStockId
 router.put('/reserved/:id', updateAReservedStock); // Update reserved stock quantity
 router.put('/reserved/:id/use', useAReservedStock); // Use/consume reserved stock
 
