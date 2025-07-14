@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { getTokenPayload } from '../services/token.service';
 import { ShoppingListItemDto } from '../dtos/ShoppingListItemDto';
 import { validateOrReject } from 'class-validator';
-import { createItem, deleteItem, getUserShoppingItems, modifyItem } from '../services/shoppingList.service';
+import { addNewStock, createItem, deleteItem, getUserShoppingItems, modifyItem } from '../services/shoppingList.service';
 
 
 export const addItem = async (
@@ -93,14 +93,14 @@ export const getShoppingList = async (
   }
 };
 
-/* export const addItemToStock = async (
+export const addItemToStock = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
     try {
 
     const id = req.body;
-
+    
     await addNewStock(id);
 
     res.status(200).json({ message: 'Stock Added' });
@@ -111,4 +111,4 @@ export const getShoppingList = async (
   }
 
 
-} */
+}

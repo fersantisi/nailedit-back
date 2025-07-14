@@ -1,3 +1,4 @@
+import { promises } from "dns";
 import ReservedStock from "../database/models/ReservedStock";
 import Stock from "../database/models/Stock";
 import { ReserveStockDto } from "../dtos/ReserveStockDto";
@@ -238,4 +239,34 @@ export const useReservedStock = async (
       }
       throw new Error('Server error, check server console for more information');
     }
+}
+
+export const getAStock = async (
+  id:number
+):Promise<StockDto> => {
+  try {
+
+    const stock = await Stock.findByPk(id);
+
+      if (!stock) {
+        throw new Error('Stock not found');
+      }
+
+
+      const stockDto: StockDto = new StockDto(
+        stock.id,
+        stock.itemName,
+        stock.quantity,
+        stock.unit,
+        stock.reserved,
+        stock.userid
+      );
+
+      return stockDto;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+    }
+    throw new Error('Server error, check server console for more information');
+  }
 }

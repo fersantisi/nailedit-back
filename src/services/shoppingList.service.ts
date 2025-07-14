@@ -1,5 +1,6 @@
 import ShoppingList from "../database/models/shoppingList";
 import { ShoppingListItemDto } from "../dtos/ShoppingListItemDto";
+import { getAStock, updateStock } from "./stock.service";
 
 
 
@@ -90,12 +91,21 @@ export const modifyItem = async (
     }
 };
 
-/* export const addNewStock = async (
+export const addNewStock = async (
     id: number,
 ): Promise<void> => {
 
     try {
-        const item = await ShoppingList.findByPk(itemDto.id);
+        const item = await ShoppingList.findByPk(id);
+
+        if(!item){
+            throw new Error('Item not found');
+        }
+        const stock = await getAStock(item.itemid);
+
+        stock.quantity = item.quantity;
+        
+        await updateStock(stock);
 
     } catch (error) {
         if (error instanceof Error) {
@@ -104,4 +114,5 @@ export const modifyItem = async (
         throw new Error('Server error, check server console for more information');
     }
 
-} */
+}
+
