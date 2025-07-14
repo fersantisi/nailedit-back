@@ -2,6 +2,7 @@ import e, { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { getTokenPayload } from '../services/token.service';
 import { StockDto } from '../dtos/StockDto';
+import { UpdateStockDto } from '../dtos/UpdateStockDto';
 import { ReserveStockDto } from '../dtos/ReserveStockDto';
 import {
   createStock,
@@ -12,6 +13,7 @@ import {
   unreserveStock,
   updateReservedStock,
   updateStock,
+  updateStockWithDto,
   useReservedStock,
 } from '../services/stock.service';
 
@@ -98,11 +100,11 @@ export const updateAStock = async (
     const stockId = +req.params.id;
     const { itemName, quantity, unit } = req.body;
 
-    const stockDto = new StockDto(stockId, itemName, quantity, unit, 0, 0);
+    const updateDto = new UpdateStockDto(stockId, itemName, quantity, unit);
 
-    await validateOrReject(stockDto);
+    await validateOrReject(updateDto);
 
-    await updateStock(stockDto);
+    await updateStockWithDto(updateDto);
 
     res.status(200).json({ message: 'Stock updated successfully' });
   } catch (error) {
