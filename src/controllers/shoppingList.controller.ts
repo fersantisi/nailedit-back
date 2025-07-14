@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { getTokenPayload } from '../services/token.service';
 import { ShoppingListItemDto } from '../dtos/ShoppingListItemDto';
 import { validateOrReject } from 'class-validator';
-import { addNewStock, createItem, deleteItem, getUserShoppingItems, modifyItem } from '../services/shoppingList.service';
+import { addNewStock, createItem, deleteItem, getShoppingListPdf, getUserShoppingItems, modifyItem } from '../services/shoppingList.service';
 
 
 export const addItem = async (
@@ -102,6 +102,29 @@ export const addItemToStock = async (
     const id = req.body;
     
     await addNewStock(id);
+
+    res.status(200).json({ message: 'Stock Added' });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+
+}
+
+export const downloadShoppingListPdf = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const userId = await getTokenPayload(req.cookies.authToken).userId;
+        
+        const pdfBuffer = await getShoppingListPdf(userId);
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=lista-de-compras.pdf');
+        res.status(200).send(pdfBuffer);
 
     res.status(200).json({ message: 'Stock Added' });
   } catch (error) {

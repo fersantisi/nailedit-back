@@ -1,6 +1,7 @@
 import ShoppingList from "../database/models/shoppingList";
 import { ShoppingListItemDto } from "../dtos/ShoppingListItemDto";
 import { getAStock, updateStock } from "./stock.service";
+import PDFDocument from "pdfkit";
 
 
 
@@ -116,3 +117,40 @@ export const addNewStock = async (
 
 }
 
+export const getShoppingListPdf = async (
+    userId: number
+): Promise<Buffer> => {
+
+  const items: ShoppingListItemDto[] = await getUserShoppingItems(userId);
+
+  const doc = new PDFDocument({ margin: 30, size: 'A4' });
+
+  const buffers: Uint8Array[] = [];
+
+  
+  doc.on('data', buffers.push.bind(buffers));
+  return new Promise<Buffer>((resolve, reject) => {
+    doc.on('end', () => {
+      const pdfBuffer = Buffer.concat(buffers);
+      resolve(pdfBuffer);
+    });
+
+    doc.on('error', reject);
+
+    doc.fontSize(18).text('Lista de Compras', { align: 'center' });
+    doc.moveDown();
+
+    doc.fontSize(12).text('Ítem', 50, doc.y, { continued: true });
+    doc.text('Cantidad', 250, doc.y, { continued: true });
+    doc.text('Unidad', 350);
+    doc.moveDown();
+
+    items.forEach((item) => {
+      doc.text(item.itemName, 50, doc.y, { continued: true });
+      doc.text(item.quantity.toString(), 250, doc.y, { continued: true });
+      doc.text(item.unit, 350);
+    });
+
+    doc.end();
+  });
+};
