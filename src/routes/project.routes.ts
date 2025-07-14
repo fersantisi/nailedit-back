@@ -31,7 +31,8 @@ import {
   getANote,
   updateANote,
 } from '../controllers/note.controller';
-import { getNoteByGoalIdService } from '../services/note.service';import { getAllStock } from '../controllers/stock.controller';
+import { getNoteByGoalIdService } from '../services/note.service';
+import { getAllStock } from '../controllers/stock.controller';
 import {
   uploadFile,
   getFilesForProject,

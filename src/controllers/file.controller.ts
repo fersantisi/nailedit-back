@@ -1,5 +1,7 @@
 import { Response, Request } from 'express';
 import { deleteFile, getFileById, getProjectFiles, saveFile } from '../services/file.service';
+import path from 'path';
+import fs from 'fs';
 
 export const uploadFile = async (
   req: Request & { file?: Express.Multer.File },
@@ -73,7 +75,31 @@ export const getFile = async (req: Request, res: Response): Promise<void> => {
 
   try {
     const file = await getFileById(fileId);
-    res.status(200).json(file);
+    
+    // Build the full file path (remove leading slash if present)
+    const fullPath = path.join(process.cwd(), file.path.startsWith('/') ? file.path.slice(1) : file.path);
+    
+    // Check if file exists on filesystem
+    if (!fs.existsSync(fullPath)) {
+      res.status(404).json({ message: 'File not found on filesystem' });
+      return;
+    }
+    
+    // Set proper headers for file download
+    res.setHeader('Content-Type', file.type || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
+    
+    // Stream the file
+    const fileStream = fs.createReadStream(fullPath);
+    fileStream.pipe(res);
+    
+    fileStream.on('error', (error) => {
+      console.error('Error streaming file:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ message: 'Error streaming file' });
+      }
+    });
+    
   } catch (error) {
     res.status(404).json({ message: (error as Error).message });
   }
