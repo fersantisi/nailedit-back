@@ -1,4 +1,4 @@
-import e, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { getTokenPayload } from '../services/token.service';
 import { StockDto } from '../dtos/StockDto';
