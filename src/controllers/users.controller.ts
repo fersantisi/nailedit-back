@@ -4,9 +4,14 @@ import {
   createNewUser,
   getUserData,
   updateUserPassword,
+  getUserProfile,
+  updateUserPasswordWithValidation,
 } from '../services/users.service';
 import { verify } from 'crypto';
 import jwt from 'jsonwebtoken';
+import { getTokenPayload } from '../services/token.service';
+import { validateOrReject } from 'class-validator';
+import { UpdatePasswordDto } from '../dtos/UserProfileDto';
 
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
@@ -64,5 +69,72 @@ export const loggedIn = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json(userData);
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });
+  }
+};
+
+export const getUserProfileController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
+
+    const userProfile = await getUserProfile(userId);
+    if (!userProfile) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.status(200).json(userProfile);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+      res.status(500).json({
+        message:
+          'Internal server error, check server console for more information',
+      });
+    }
+  }
+};
+
+export const updateUserPasswordController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
+    const { currentPassword, newPassword } = req.body;
+
+    const passwordUpdate = new UpdatePasswordDto(currentPassword, newPassword);
+    await validateOrReject(passwordUpdate);
+
+    const isUpdated = await updateUserPasswordWithValidation(
+      userId,
+      currentPassword,
+      newPassword,
+    );
+
+    if (!isUpdated) {
+      res.status(400).json({ message: 'Current password is incorrect' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    if (Array.isArray(error)) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: error.map((err) => ({
+          property: err.property,
+          constraints: err.constraints,
+        })),
+      });
+    } else if (error instanceof Error) {
+      console.log(error.message);
+      res.status(500).json({
+        message:
+          'Internal server error, check server console for more information',
+      });
+    }
   }
 };

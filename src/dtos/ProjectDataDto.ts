@@ -8,7 +8,10 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class ProjectDto {
+export class ProjectDataDto {
+  @IsNumber()
+  declare id: number;
+
   @IsString()
   @IsNotEmpty({ message: 'Name is requiered' })
   declare name: string;
@@ -30,22 +33,30 @@ export class ProjectDto {
   declare dueDate: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  declare userId: number;
+  @IsDateString()
+  declare creationDate: Date;
+
+  @IsNotEmpty()
+  @IsDate()
+  declare updatedDate: Date;
 
   constructor(
+    id: number,
     name: string,
     description: string,
     category: string,
     image: string,
     dueDate: string,
-    userId: number,
+    creationDate: Date,
+    updatedDate: Date,
   ) {
+    this.id = id;
     this.name = name;
     this.description = description;
     this.category = category;
     this.image = image;
     this.dueDate = dueDate;
-    this.userId = userId;
+    this.creationDate = creationDate;
+    this.updatedDate = updatedDate;
   }
 }

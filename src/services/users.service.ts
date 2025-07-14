@@ -1,6 +1,7 @@
 import User from '../database/models/User';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { UserProfileDto } from '../dtos/UserProfileDto';
 
 export const createNewUser = async (
   username: string,
@@ -14,7 +15,9 @@ export const createNewUser = async (
      */
     const { Op } = require('sequelize');
 
-    const user = await User.findOne({ where: {[Op.or]: [{email}, {username}]}});
+    const user = await User.findOne({
+      where: { [Op.or]: [{ email }, { username }] },
+    });
     if (user) {
       return false;
     }
@@ -42,9 +45,12 @@ export const getUserData = async (id: string): Promise<User | null> => {
   }
 };
 
-export const getUserDataJwt = async (token:string): Promise<User | null> => {
+export const getUserDataJwt = async (token: string): Promise<User | null> => {
   try {
-    const payload = jwt.verify(token, process.env.SECRET_KEY || "123") as JwtPayload;
+    const payload = jwt.verify(
+      token,
+      process.env.SECRET_KEY || '123',
+    ) as JwtPayload;
     const userId = payload.userId;
     const user = await User.findByPk(userId);
     if (!user) {
@@ -55,7 +61,6 @@ export const getUserDataJwt = async (token:string): Promise<User | null> => {
     throw error;
   }
 };
-
 
 export const getAllUsers = async (): Promise<User[]> => {
   try {
@@ -81,20 +86,19 @@ export const updateUserPassword = async (
   return true;
 };
 
-export const deleteUser = async (id:string): Promise<boolean> => {
-  
+export const deleteUser = async (id: string): Promise<boolean> => {
   try {
     const user = await User.findByPk(id);
     if (!user) {
       return false;
     }
-    
+
     await User.destroy({
       where: {
         id,
       },
     });
-    return true
+    return true;
   } catch (error) {
     throw error;
   }
@@ -122,10 +126,9 @@ export const createAdmin = async (): Promise<void> => {
   }
 };
 
-export const verifyEmail = async (email:string): Promise<boolean> =>{
-
+export const verifyEmail = async (email: string): Promise<boolean> => {
   try {
-    const user = await User.findOne({where: {email: email}})
+    const user = await User.findOne({ where: { email: email } });
     if (!user) {
       return false;
     }
@@ -133,31 +136,129 @@ export const verifyEmail = async (email:string): Promise<boolean> =>{
   } catch (error) {
     throw error;
   }
-}
+};
 
-export const passwordRecovery = async(token:string, password: string):Promise<void> =>{
-  
+export const passwordRecovery = async (
+  token: string,
+  password: string,
+): Promise<void> => {
   try {
-      const payload = await jwt.verify(token, process.env.PASSWORD_RECOVERY_KEY || '123') as JwtPayload;
+    const payload = (await jwt.verify(
+      token,
+      process.env.PASSWORD_RECOVERY_KEY || '123',
+    )) as JwtPayload;
 
-      const{email, ...rest} = payload
+    const { email, ...rest } = payload;
 
-      console.log(email)
+    console.log(email);
 
-      const user = await User.findOne({where: {email: email}})
+    const user = await User.findOne({ where: { email: email } });
 
-      if (!user) {
-        throw new Error("User not Found");
-      }
+    if (!user) {
+      throw new Error('User not Found');
+    }
 
-      const hashedPassword = bcrypt.hashSync(password, 10);
+    const hashedPassword = bcrypt.hashSync(password, 10);
 
-      user.password = hashedPassword;
+    user.password = hashedPassword;
 
-      await user.save()
-
+    await user.save();
   } catch (error) {
     throw error;
   }
+};
 
-}
+export const getUserProfile = async (
+  userId: number,
+): Promise<UserProfileDto | null> => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return null;
+    }
+
+    return new UserProfileDto(user.id, user.username, user.email);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateUserPasswordWithValidation = async (
+  userId: number,
+  currentPassword: string,
+  newPassword: string,
+): Promise<boolean> => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return false;
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = bcrypt.compareSync(
+      currentPassword,
+      user.password,
+    );
+
+    if (!isCurrentPasswordValid) {
+      return false;
+    }
+
+    // Hash new password
+    const hashedNewPassword = bcrypt.hashSync(newPassword, 10);
+    user.password = hashedNewPassword;
+
+    await user.save();
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateUserProfile = async (
+  userId: string,
+  username: string,
+  email: string,
+): Promise<boolean> => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return false;
+    }
+
+    // Check if email or username already exists for other users
+    const { Op } = require('sequelize');
+    const existingUser = await User.findOne({
+      where: {
+        [Op.and]: [
+          { [Op.or]: [{ email }, { username }] },
+          { id: { [Op.ne]: userId } },
+        ],
+      },
+    });
+
+    if (existingUser) {
+      return false; // Email or username already exists
+    }
+
+    user.username = username;
+    user.email = email;
+
+    await user.save();
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const passwordRecoveryVerify = async (token: string): Promise<any> => {
+  try {
+    const payload = jwt.verify(
+      token,
+      process.env.PASSWORD_RECOVERY_KEY || '123',
+    ) as JwtPayload;
+    return payload;
+  } catch (error) {
+    throw error;
+  }
+};

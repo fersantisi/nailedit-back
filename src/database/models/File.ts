@@ -1,75 +1,58 @@
 import {
   Table,
   Column,
-  DataType,
   Model,
+  DataType,
   ForeignKey,
-  CreatedAt,
-  UpdatedAt,
   BelongsTo,
-  HasMany,
+  CreatedAt,
 } from 'sequelize-typescript';
-import User from './User';
 import Project from './Project';
-import Note from './Note';
-import Task from './Task';
 
 @Table({
   timestamps: true,
-  tableName: 'goals',
-  modelName: 'Goal',
+  tableName: 'files',
+  modelName: 'File',
 })
-class Goal extends Model {
+class File extends Model {
   @Column({
     primaryKey: true,
-    type: DataType.INTEGER,
     autoIncrement: true,
+    type: DataType.INTEGER,
   })
   declare id: number;
 
   @ForeignKey(() => Project)
   @Column({
     type: DataType.INTEGER,
+    allowNull: false,
   })
   declare projectId: number;
 
   @Column({
     type: DataType.STRING,
+    allowNull: false,
   })
-  declare name: string;
+  declare filename: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  declare path: string;
 
   @Column({
     type: DataType.STRING,
   })
-  declare description: string;
-
-  @Column({
-    type: DataType.STRING,
-  })
-  declare dueDate: string;
-
-  @Column({
-    type: DataType.BOOLEAN,
-    defaultValue: false,
-  })
-  declare completed: boolean;
+  declare type: string;
 
   @CreatedAt
   declare created_at: Date;
-
-  @UpdatedAt
-  declare updated_at: Date;
 
   @BelongsTo(() => Project, {
     onDelete: 'CASCADE',
   })
   declare project: Project;
-
-  @HasMany(() => Note)
-  declare note: Note[];
-
-  @HasMany(() => Task)
-  declare task: Task[];
 }
 
-export default Goal;
+export default File;

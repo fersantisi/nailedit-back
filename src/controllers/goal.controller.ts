@@ -1,22 +1,39 @@
 import { Request, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { GoalDto } from '../dtos/GoalDto';
-import { createGoal, deleteGoal, getGoal, getGoalsByProjectIdService, updateGoal} from '../services/goals.service';
+import {
+  createGoal,
+  deleteGoal,
+  getGoal,
+  getGoalsByProjectIdService,
+  updateGoal,
+  getGoalWithProjectId,
+  getAllGoals,
+} from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
+import { validateGoalDueDate } from '../utils/validateDueDate';
 
 export const createNewGoal = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   console.log('createNewGoal');
-  
+
   try {
-    const projectIdSTR = req.params.projectId
-    const projectIdNumber = +projectIdSTR
+    const projectIdSTR = req.params.projectId;
+    const projectIdNumber = +projectIdSTR;
 
     const { name, description, dueDate } = req.body;
 
+    // Validate that goal due date is not later than project due date
+    const isDueDateValid = await validateGoalDueDate(projectIdNumber, dueDate);
+    if (!isDueDateValid) {
+      res.status(400).json({
+        message: 'Goal due date cannot be later than the project due date',
+      });
+      return;
+    }
 
     const goal: GoalDto = new GoalDto(
       name,
@@ -25,8 +42,7 @@ export const createNewGoal = async (
       projectIdNumber,
     );
 
-    console.log(goal.duedate);
-    
+    console.log(goal.dueDate);
 
     await validateOrReject(goal);
 
@@ -67,15 +83,12 @@ export const deleteAGoal = async (
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
 
-export const getAGoal = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const getAGoal = async (req: Request, res: Response): Promise<void> => {
   try {
     const goalId = req.params.goalId;
     const goal: GoalDataDto = await getGoal(goalId);
@@ -83,7 +96,7 @@ export const getAGoal = async (
     res.status(201).json(goal);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
@@ -92,38 +105,63 @@ export const getGoalsByProjectId = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  console.log('getGoalsByProjectIdfbjsdafbnsjkafnskdfnbsjdafbhsafs;abf;kjsdbfjsdbfk;jbfjaksfbsjkabfsk;ajbfsjfbsfsa', req.params.projectId);
+  console.log(
+    'getGoalsByProjectIdfbjsdafbnsjkafnskdfnbsjdafbhsafs;abf;kjsdbfjsdbfk;jbfjaksfbsjkabfsk;ajbfsjfbsfsa',
+    req.params.projectId,
+  );
   try {
-    
     const projectIdStr = req.params.projectId;
     const projectIdNumber = +projectIdStr;
 
-    const goals: GoalDataDto[] = await getGoalsByProjectIdService(projectIdNumber);
-    
+    const goals: GoalDataDto[] =
+      await getGoalsByProjectIdService(projectIdNumber);
+
     res.status(200).json(goals);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 };
 
-export const updateAGoal = async(req: Request, res: Response):Promise<void>=> {
-  try{
+export const updateAGoal = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
     const { name, description, category, image, dueDate } = req.body;
     const goalIdStr = req.params.goalId;
     const goalIdNumber = +goalIdStr;
 
-    const goal: UpdateGoalDto = new UpdateGoalDto(
+    // Get the goal to find its project ID
+    const goal = await getGoalWithProjectId(goalIdStr);
+    if (!goal) {
+      res.status(404).json({ message: 'Goal not found' });
+      return;
+    }
+
+    // Get the project ID from the goal
+    const projectId = goal.projectId;
+
+    // Validate that goal due date is not later than project due date
+    const isDueDateValid = await validateGoalDueDate(projectId, dueDate);
+    if (!isDueDateValid) {
+      res.status(400).json({
+        message: 'Goal due date cannot be later than the project due date',
+      });
+      return;
+    }
+
+    const goalUpdate: UpdateGoalDto = new UpdateGoalDto(
       name,
       description,
       dueDate,
       goalIdNumber,
     );
 
-    await validateOrReject(goal);
+    await validateOrReject(goalUpdate);
 
-    await updateGoal(goal);
+    await updateGoal(goalUpdate);
 
     res.status(201).json({
       message: 'Goal updated',
@@ -142,7 +180,57 @@ export const updateAGoal = async(req: Request, res: Response):Promise<void>=> {
       res.status(500).json({ message: error.message });
     } else {
       res.status(500).json({ message: 'Unknown error' });
-    } 
+    }
   }
-}
+};
 
+export const getAllGoalsController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    // Get userId from req.user (set by auth middleware)
+    const userId = (req as any).user?.id;
+    const goals = await getAllGoals(userId);
+
+    // Transform the response to match frontend expectations
+    const transformedGoals = goals.map((goal) => ({
+      id: goal.id,
+      projectId: goal.projectId,
+      name: goal.name,
+      description: goal.description,
+      dueDate: goal.dueDate,
+      createdAt: goal.createdAt,
+      updatedAt: goal.updatedAt,
+    }));
+
+    res.status(200).json(transformedGoals);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};
+
+export const setGoalCompleted = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectId = req.params.projectId;
+    const goalId = req.params.goalId;
+    const { completed } = req.body;
+    const goal = await getGoalWithProjectId(goalId);
+    if (!goal || String(goal.projectId) !== String(projectId)) {
+      res.status(404).json({ message: 'Goal not found for this project' });
+      return;
+    }
+    goal.completed = completed;
+    await goal.save();
+    res.status(200).json({ message: 'Goal completion updated', completed });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating goal completion' });
+  }
+};
