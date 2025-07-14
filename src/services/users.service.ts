@@ -250,3 +250,15 @@ export const updateUserProfile = async (
     throw error;
   }
 };
+
+export const passwordRecoveryVerify = async (token: string): Promise<any> => {
+  try {
+    const payload = jwt.verify(
+      token,
+      process.env.PASSWORD_RECOVERY_KEY || '123',
+    ) as JwtPayload;
+    return payload;
+  } catch (error) {
+    throw error;
+  }
+};

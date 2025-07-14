@@ -27,8 +27,6 @@ class AtLeastOneIdConstraint implements ValidatorConstraintInterface {
   }
 }
 
-
-
 export class NoteDataDto {
   @IsString()
   @IsNotEmpty({ message: 'Id is required' })
@@ -54,11 +52,11 @@ export class NoteDataDto {
 
   @IsNotEmpty()
   @IsDate()
-  declare created_at: Date;
+  declare createdAt: Date;
 
   @IsNotEmpty()
   @IsDate()
-  declare updated_at: Date;
+  declare updatedAt: Date;
 
   @IsOptional()
   @Validate(AtLeastOneIdConstraint)
@@ -68,12 +66,11 @@ export class NoteDataDto {
     id: number,
     name: string,
     description: string,
-    projectId: number|null,
-    goalId: number|null,
-    taskId: number|null,
-    creationDate: Date,
-    updatedDate: Date
-    
+    projectId: number | null,
+    goalId: number | null,
+    taskId: number | null,
+    createdAt: Date,
+    updatedAt: Date,
   ) {
     this.id = id;
     this.name = name;
@@ -81,7 +78,7 @@ export class NoteDataDto {
     this.projectId = projectId;
     this.goalId = goalId;
     this.taskId = taskId;
-    this.created_at = creationDate;
-    this.updated_at = updatedDate;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 }

@@ -16,6 +16,8 @@ import {
 import User from './User';
 import Goal from './Goal';
 import Note from "./Note";
+import ReservedStock from "./ReservedStock";
+import Stock from "./ReservedStock";
 import File from './File';
 
 @Table({
@@ -78,6 +80,10 @@ class Project extends Model {
 
   @HasMany(() => Note)
   declare note: Note[];
+
+  @HasMany(() => ReservedStock)
+  declare resrvedStock: ReservedStock[];
+
 
   @HasMany(() => File)
   declare files: File[];

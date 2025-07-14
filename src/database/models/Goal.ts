@@ -48,6 +48,12 @@ class Goal extends Model {
   })
   declare dueDate: string;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  declare completed: boolean;
+
   @CreatedAt
   declare created_at: Date;
 
@@ -58,7 +64,7 @@ class Goal extends Model {
     onDelete: 'CASCADE',
   })
   declare project: Project;
-  
+
   @HasMany(() => Note)
   declare note: Note[];
 

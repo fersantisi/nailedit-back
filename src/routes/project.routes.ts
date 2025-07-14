@@ -13,6 +13,7 @@ import {
   getGoalsByProjectId,
   updateAGoal,
   getAllGoalsController,
+  setGoalCompleted,
 } from '../controllers/goal.controller';
 import {
   createNewTask,
@@ -21,8 +22,16 @@ import {
   getTasksByGoalId,
   updateATask,
   getAllTasksController,
+  setTaskCompleted,
 } from '../controllers/task.controller';
-import { createNewNote, deleteANote, getAllObjectNotes, getANote, updateANote } from '../controllers/note.controller';
+import {
+  createNewNote,
+  deleteANote,
+  getAllObjectNotes,
+  getANote,
+  updateANote,
+} from '../controllers/note.controller';
+import { getNoteByGoalIdService } from '../services/note.service';import { getAllStock } from '../controllers/stock.controller';
 import {
   uploadFile,
   getFilesForProject,
@@ -40,6 +49,12 @@ router.get('/list', getProjectsByUserId);
 router.put('/:projectId/updateProject', updateAProject);
 router.get('/:projectId', getAProject);
 
+//get proyect reserved stock
+router.get('/:id/stock', getAllStock);
+
+//get proyect reserved stock
+router.get('/:id/stock', getAllStock);
+
 router.post('/:projectId/createGoal', createNewGoal);
 router.delete('/:projectId/goal/:goalId', deleteAGoal);
 router.get('/:projectId/goal/:goalId', getAGoal);
@@ -53,30 +68,42 @@ router.get('/:projectId/goal/:goalId/tasks', getTasksByGoalId);
 router.put('/:projectId/goal/:goalId/task/:taskId/updateTask', updateATask);
 
 //goal notes routes
-router.post('/:projectId/goal/:goalId/createNote', createNewNote)
-router.get('/:projectId/goal/:goalId/note/:noteId', getANote)
-router.delete('/:projectId/goal/:goalId/note/:noteId', deleteANote)
+router.post('/:projectId/goal/:goalId/createNote', createNewNote);
+router.get('/:projectId/goal/:goalId/note/:noteId', getANote);
+router.delete('/:projectId/goal/:goalId/note/:noteId', deleteANote);
 router.get('/:projectId/goal/:goalId/notes', getAllObjectNotes);
-router.put('/:projectId/goal/:goalId/note/:noteId/updateNote', updateANote)
+router.put('/:projectId/goal/:goalId/note/:noteId/updateNote', updateANote);
 
 //task notes routes
-router.post('/:projectId/goal/:goalId/task/:taskId/createNote', createNewNote)
-router.get('/:projectId/goal/:goalId/task/:taskId/note/:noteId', getANote)
-router.delete('/:projectId/goal/:goalId/task/:taskId/note/:noteId', deleteANote)
+router.post('/:projectId/goal/:goalId/task/:taskId/createNote', createNewNote);
+router.get('/:projectId/goal/:goalId/task/:taskId/note/:noteId', getANote);
+router.delete(
+  '/:projectId/goal/:goalId/task/:taskId/note/:noteId',
+  deleteANote,
+);
 router.get('/:projectId/goal/:goalId/task/:taskId/notes', getAllObjectNotes);
-router.put('/:projectId/goal/:goalId/task/:taskId/note/:noteId/updateNote', updateANote)
+router.put(
+  '/:projectId/goal/:goalId/task/:taskId/note/:noteId/updateNote',
+  updateANote,
+);
 
 //project notes routes
-router.post('/:projectId/createNote', createNewNote)
-router.get('/:projectId/note/:noteId', getANote)
-router.delete('/:projectId/note/:noteId', deleteANote)
+router.post('/:projectId/createNote', createNewNote);
+router.get('/:projectId/note/:noteId', getANote);
+router.delete('/:projectId/note/:noteId', deleteANote);
 router.get('/:projectId/notes', getAllObjectNotes);
-router.put('/:projectId/note/:noteId/updateNote', updateANote)
+router.put('/:projectId/note/:noteId/updateNote', updateANote);
 router.put('/:projectId/goal/:goalId/task/:taskId/updateTask', updateATask);
 
 // Global routes (not nested under specific project/goal)
 router.get('/goals/list', getAllGoalsController);
 router.get('/tasks/list', getAllTasksController);
+
+router.patch('/:projectId/goal/:goalId/complete', setGoalCompleted);
+router.patch(
+  '/:projectId/goal/:goalId/task/:taskId/complete',
+  setTaskCompleted,
+);
 
 router.post('/:projectId/upload', upload.single('file'), uploadFile);
 router.get('/:projectId/files', getFilesForProject);

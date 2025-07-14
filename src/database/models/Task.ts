@@ -54,6 +54,12 @@ class Task extends Model {
   })
   declare dueDate: string;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  declare completed: boolean;
+
   @CreatedAt
   declare created_at: Date;
 

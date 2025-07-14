@@ -1,18 +1,17 @@
 import { Request, Response } from 'express';
-import { ProjectDto } from '../dtos/ProjectDto';
 import { getTokenPayload } from '../services/token.service';
 import {
   createProject,
   deleteProject,
   getProject,
-  getProjectByIdService,
   getProjectsByUserIdService,
   updateProject,
 } from '../services/project.service';
-import { ProjectDataDto } from '../dtos/ProjectDataDto';
 import { validateOrReject } from 'class-validator';
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 import { validateProjectDueDateUpdate } from '../utils/validateDueDate';
+import { ProjectDto } from '../dtos/ProjectDto';
+import { ProjectDataDto } from '../dtos/ProjectDataDto';
 
 export const createNewProject = async (
   req: Request,
@@ -33,8 +32,6 @@ export const createNewProject = async (
       dueDate,
       userId,
     );
-
-    console.log(project);
 
     await validateOrReject(project);
 
@@ -74,7 +71,7 @@ export const deleteAProject = async (
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
@@ -95,7 +92,7 @@ export const getAProject = async (
     res.status(201).json(project);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
@@ -112,7 +109,7 @@ export const getProjectsByUserId = async (
     res.status(200).json(projects);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 };

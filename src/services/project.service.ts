@@ -1,8 +1,12 @@
 import { error } from 'console';
 import Project from '../database/models/Project';
+import ReservedStock from '../database/models/ReservedStock';
+import sequelize from '../database/database';
+
+import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 import { ProjectDto } from '../dtos/ProjectDto';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
-import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
+import { unreserveStock } from './stock.service';
 
 export const createProject = async (project: ProjectDto) => {
   try {
@@ -31,15 +35,48 @@ export const createProject = async (project: ProjectDto) => {
 };
 
 export const deleteProject = async (projectId: string) => {
+  const transaction = await sequelize.transaction();
+  
   try {
-    const project = await Project.findByPk(projectId);
+    const project = await Project.findByPk(projectId, { transaction });
     if (!project) {
       throw new Error('Project not found');
     }
-    await project.destroy();
+
+    // Get all reserved stock for this project
+    const reservedStocks = await ReservedStock.findAll({
+      where: { projectId: projectId },
+      transaction
+    });
+
+    // Unreserve all stock items (this restores stock quantities)
+    console.log(
+      `Found ${reservedStocks.length} reserved stock items to clean up for project ${projectId}`,
+    );
+
+    for (const reservedStock of reservedStocks) {
+      console.log(
+        `Unreserving stock item ${reservedStock.id} (stockId: ${reservedStock.stockId}, quantity: ${reservedStock.quantity})`,
+      );
+      await unreserveStock(reservedStock.id);
+    }
+
+    // Now delete the project
+    await project.destroy({ transaction });
+    
+    // Commit the transaction if everything succeeded
+    await transaction.commit();
+    console.log(
+      `Project ${projectId} deleted successfully with ${reservedStocks.length} reserved stock items cleaned up`,
+    );
+    
   } catch (error) {
+    // Rollback the transaction if anything failed
+    await transaction.rollback();
+    
     if (error instanceof Error) {
-      console.log(error);
+      console.log(`Error deleting project ${projectId}:`, error);
+      throw error; // Re-throw to let controller handle the error response
     }
   }
 };
@@ -53,7 +90,7 @@ export const getProject = async (
       throw new Error('Project not found');
     }
 
-    const projectDTO: ProjectDataDto = new ProjectDataDto(
+    const projectDataDTO: ProjectDataDto = new ProjectDataDto(
       project.id,
       project.name,
       project.description,
@@ -64,7 +101,7 @@ export const getProject = async (
       project.updated_at,
     );
 
-    return projectDTO;
+    return projectDataDTO;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
@@ -81,7 +118,7 @@ export const getProjectsByUserIdService = async (
       where: { userId: userId },
     });
 
-    const projectDTOs: ProjectDataDto[] = projects.map((project) => {
+    const projectDataDTOs: ProjectDataDto[] = projects.map((project) => {
       return new ProjectDataDto(
         project.id,
         project.name,
@@ -94,7 +131,7 @@ export const getProjectsByUserIdService = async (
       );
     });
 
-    return projectDTOs;
+    return projectDataDTOs;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);

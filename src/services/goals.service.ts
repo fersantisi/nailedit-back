@@ -58,6 +58,7 @@ export const getGoal = async (goalId: string): Promise<GoalDataDto> => {
       goal.dueDate,
       goal.created_at,
       goal.updated_at,
+      goal.completed,
     );
 
     return goalDto;
@@ -85,6 +86,7 @@ export const getGoalsByProjectIdService = async (
         goal.dueDate,
         goal.created_at,
         goal.updated_at,
+        goal.completed,
       );
     });
 
@@ -124,13 +126,15 @@ export const getGoalWithProjectId = async (goalId: string) => {
   }
 };
 
-export const getAllGoals = async (): Promise<any[]> => {
+export const getAllGoals = async (userId?: number): Promise<any[]> => {
   try {
     const goals = await Goal.findAll({
       include: [
         {
           model: Project,
           as: 'project',
+          where: userId ? { userId } : undefined,
+          required: true,
         },
       ],
     });

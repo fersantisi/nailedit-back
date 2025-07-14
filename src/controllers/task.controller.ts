@@ -13,6 +13,8 @@ import {
 } from '../services/task.service';
 import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
 import { validateTaskDueDate } from '../utils/validateDueDate';
+import Task from '../database/models/Task';
+import Goal from '../database/models/Goal';
 
 export const createNewTask = async (
   req: Request,
@@ -83,7 +85,7 @@ export const deleteATask = async (
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
@@ -92,12 +94,10 @@ export const getATask = async (req: Request, res: Response): Promise<void> => {
   try {
     const taskId = req.params.taskId;
     const task: TaskDataDto = await gettask(taskId);
-    console.log('////////////////////', task);
-
-    res.status(201).json(task);
+    res.status(201).json({ ...task, completed: task.completed });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
@@ -116,12 +116,12 @@ export const getTasksByGoalId = async (
     const goalIdNumber = +goalIdStr;
 
     const tasks: TaskDataDto[] = await getTaskByGoalIdService(goalIdNumber);
-    console.log(tasks);
-
-    res.status(200).json(tasks);
+    res
+      .status(200)
+      .json(tasks.map((task) => ({ ...task, completed: task.completed })));
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 };
@@ -194,7 +194,9 @@ export const getAllTasksController = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const tasks = await getAllTasks();
+    // Get userId from req.user (set by auth middleware)
+    const userId = (req as any).user?.id;
+    const tasks = await getAllTasks(userId);
 
     // Transform the response to match frontend expectations
     const transformedTasks = tasks.map((task) => ({
@@ -205,6 +207,9 @@ export const getAllTasksController = async (
       description: task.description,
       label: task.label,
       dueDate: task.dueDate,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+      completed: task.completed,
     }));
 
     res.status(200).json(transformedTasks);
@@ -214,5 +219,39 @@ export const getAllTasksController = async (
     } else {
       res.status(500).json({ message: 'Unknown error' });
     }
+  }
+};
+
+export const setTaskCompleted = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectId = req.params.projectId;
+    const goalId = req.params.goalId;
+    const taskId = req.params.taskId;
+    const { completed } = req.body;
+    const task = await gettask(taskId);
+    if (!task || String(task.goalId) !== String(goalId)) {
+      res.status(404).json({ message: 'Task not found for this goal' });
+      return;
+    }
+    // gettask returns a DTO, need to fetch the model
+    const taskModel = await Task.findByPk(taskId);
+    if (!taskModel) {
+      res.status(404).json({ message: 'Task not found' });
+      return;
+    }
+    // Optionally, validate the goal's projectId
+    const goal = await Goal.findByPk(goalId);
+    if (!goal || String(goal.projectId) !== String(projectId)) {
+      res.status(404).json({ message: 'Goal not found for this project' });
+      return;
+    }
+    taskModel.completed = completed;
+    await taskModel.save();
+    res.status(200).json({ message: 'Task completion updated', completed });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating task completion' });
   }
 };

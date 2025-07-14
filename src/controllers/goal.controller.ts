@@ -83,7 +83,7 @@ export const deleteAGoal = async (
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
@@ -96,7 +96,7 @@ export const getAGoal = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json(goal);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(404).json({ message: error.message });
     }
   }
 };
@@ -119,7 +119,7 @@ export const getGoalsByProjectId = async (
     res.status(200).json(goals);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(418).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 };
@@ -189,7 +189,9 @@ export const getAllGoalsController = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const goals = await getAllGoals();
+    // Get userId from req.user (set by auth middleware)
+    const userId = (req as any).user?.id;
+    const goals = await getAllGoals(userId);
 
     // Transform the response to match frontend expectations
     const transformedGoals = goals.map((goal) => ({
@@ -198,6 +200,8 @@ export const getAllGoalsController = async (
       name: goal.name,
       description: goal.description,
       dueDate: goal.dueDate,
+      createdAt: goal.createdAt,
+      updatedAt: goal.updatedAt,
     }));
 
     res.status(200).json(transformedGoals);
@@ -207,5 +211,26 @@ export const getAllGoalsController = async (
     } else {
       res.status(500).json({ message: 'Unknown error' });
     }
+  }
+};
+
+export const setGoalCompleted = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectId = req.params.projectId;
+    const goalId = req.params.goalId;
+    const { completed } = req.body;
+    const goal = await getGoalWithProjectId(goalId);
+    if (!goal || String(goal.projectId) !== String(projectId)) {
+      res.status(404).json({ message: 'Goal not found for this project' });
+      return;
+    }
+    goal.completed = completed;
+    await goal.save();
+    res.status(200).json({ message: 'Goal completion updated', completed });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating goal completion' });
   }
 };
