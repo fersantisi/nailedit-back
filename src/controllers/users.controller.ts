@@ -13,6 +13,7 @@ import { getTokenPayload } from '../services/token.service';
 import { validateOrReject } from 'class-validator';
 import { UpdatePasswordDto } from '../dtos/UserProfileDto';
 import { getSharedProjects } from '../services/project.service';
+import { getUserParticipationRequests } from '../services/community.service';
 
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
@@ -145,11 +146,46 @@ export const getParticipatedProjects = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const userId = await getTokenPayload(req.cookies.authToken).userId;
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      res.status(401).json({ message: 'No token provided' });
+      return;
+    }
+
+    const payload = getTokenPayload(token);
+    const userId = payload.id;
 
     const participatedProjects = await getSharedProjects(userId);
 
     res.status(200).json(participatedProjects);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+      res.status(500).json({
+        message:
+          'Internal server error, check server console for more information',
+      });
+    }
+  }
+};
+
+export const getUserPendingRequests = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      res.status(401).json({ message: 'No token provided' });
+      return;
+    }
+
+    const payload = getTokenPayload(token);
+    const userId = payload.id;
+
+    const pendingRequests = await getUserParticipationRequests(userId);
+
+    res.status(200).json(pendingRequests);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);

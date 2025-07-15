@@ -6,6 +6,7 @@ import {
   getUserProfileController,
   updateUserPasswordController,
   getParticipatedProjects,
+  getUserPendingRequests,
 } from '../controllers/users.controller';
 import {
   validateToken,
@@ -23,6 +24,7 @@ router.get('/profile', getUserProfileController);
 router.put('/password', updateUserPasswordController);
 router.get('/me', loggedIn);
 router.get('/me/participated-projects', getParticipatedProjects);
+router.get('/me/participation-requests', getUserPendingRequests);
 
 // Legacy routes (parameterized routes last)
 router.put('/:id', updateUser);
