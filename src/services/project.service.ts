@@ -3,6 +3,9 @@ import Project from '../database/models/Project';
 import ReservedStock from '../database/models/ReservedStock';
 import sequelize from '../database/database';
 import User from '../database/models/User';
+import File from '../database/models/File';
+import fs from 'fs';
+import path from 'path';
 
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 import { ProjectDto } from '../dtos/ProjectDto';
@@ -47,17 +50,75 @@ export const deleteProject = async (projectId: string) => {
       throw new Error('Project not found');
     }
 
-    // Get all reserved stock for this project
+    // 1. Get all files for this project and delete them from filesystem
+    const projectFiles = await File.findAll({
+      where: { projectId: projectId },
+      transaction,
+    });
+
+    console.log(
+      `Found ${projectFiles.length} files to clean up for project ${projectId}`,
+    );
+
+    // Delete physical files from filesystem
+    for (const file of projectFiles) {
+      try {
+        const fullPath = path.join(
+          process.cwd(),
+          file.path.startsWith('/') ? file.path.slice(1) : file.path,
+        );
+        if (fs.existsSync(fullPath)) {
+          fs.unlinkSync(fullPath);
+          console.log(`Deleted file: ${fullPath}`);
+        }
+      } catch (fileError) {
+        console.warn(`Failed to delete file ${file.path}:`, fileError);
+        // Continue with deletion even if some files can't be deleted
+      }
+    }
+
+    // Delete project upload directory if it exists
+    try {
+      const projectUploadDir = path.join(
+        process.cwd(),
+        'uploads',
+        'projects',
+        projectId,
+      );
+      if (fs.existsSync(projectUploadDir)) {
+        fs.rmSync(projectUploadDir, { recursive: true, force: true });
+        console.log(`Deleted project upload directory: ${projectUploadDir}`);
+      }
+    } catch (dirError) {
+      console.warn(`Failed to delete project directory:`, dirError);
+    }
+
+    // 2. Remove all project participants (team members)
+    const projectParticipants = await ProjectParticipant.findAll({
+      where: { projectId: projectId },
+      transaction,
+    });
+
+    console.log(
+      `Found ${projectParticipants.length} project participants to remove for project ${projectId}`,
+    );
+
+    await ProjectParticipant.destroy({
+      where: { projectId: projectId },
+      transaction,
+    });
+
+    // 3. Get all reserved stock for this project and unreserve them
     const reservedStocks = await ReservedStock.findAll({
       where: { projectId: projectId },
       transaction,
     });
 
-    // Unreserve all stock items (this restores stock quantities)
     console.log(
       `Found ${reservedStocks.length} reserved stock items to clean up for project ${projectId}`,
     );
 
+    // Unreserve all stock items (this restores stock quantities)
     for (const reservedStock of reservedStocks) {
       console.log(
         `Unreserving stock item ${reservedStock.id} (stockId: ${reservedStock.stockId}, quantity: ${reservedStock.quantity})`,
@@ -65,13 +126,16 @@ export const deleteProject = async (projectId: string) => {
       await unreserveStock(reservedStock.id);
     }
 
-    // Now delete the project
+    // 4. Finally delete the project (this will cascade delete files due to FK constraints)
     await project.destroy({ transaction });
 
     // Commit the transaction if everything succeeded
     await transaction.commit();
     console.log(
-      `Project ${projectId} deleted successfully with ${reservedStocks.length} reserved stock items cleaned up`,
+      `Project ${projectId} deleted successfully with cleanup completed:
+      - ${projectFiles.length} files deleted from filesystem
+      - ${projectParticipants.length} project participants removed
+      - ${reservedStocks.length} reserved stock items cleaned up`,
     );
   } catch (error) {
     // Rollback the transaction if anything failed
@@ -258,15 +322,44 @@ export const searchProjects = async (
         [Op.iLike]: `%${query}%`,
       },
     },
+    include: [
+      {
+        model: User,
+        as: 'user',
+        attributes: ['id', 'username', 'email'],
+      },
+    ],
     offset,
     limit,
+  });
+
+  // Convert to ProjectDataDto format
+  const projectDataDTOs: ProjectDataDto[] = rows.map((project) => {
+    const ownerDto = new UserBasicDto(
+      project.user.id,
+      project.user.username,
+      project.user.email,
+    );
+
+    return new ProjectDataDto(
+      project.id,
+      project.name,
+      project.description,
+      project.category,
+      project.image,
+      project.dueDate,
+      project.created_at,
+      project.updated_at,
+      project.userId,
+      ownerDto,
+    );
   });
 
   return {
     total: count,
     page,
     totalPages: Math.ceil(count / limit),
-    results: rows,
+    results: projectDataDTOs,
   };
 };
 
