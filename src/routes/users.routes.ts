@@ -5,6 +5,7 @@ import {
   loggedIn,
   getUserProfileController,
   updateUserPasswordController,
+  getParticipatedProjects,
 } from '../controllers/users.controller';
 import {
   validateToken,
@@ -21,6 +22,7 @@ const router = Router();
 router.get('/profile', getUserProfileController);
 router.put('/password', updateUserPasswordController);
 router.get('/me', loggedIn);
+router.get('/me/participated-projects', getParticipatedProjects);
 
 // Legacy routes (parameterized routes last)
 router.put('/:id', updateUser);

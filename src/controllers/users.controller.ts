@@ -12,6 +12,7 @@ import jwt from 'jsonwebtoken';
 import { getTokenPayload } from '../services/token.service';
 import { validateOrReject } from 'class-validator';
 import { UpdatePasswordDto } from '../dtos/UserProfileDto';
+import { getSharedProjects } from '../services/project.service';
 
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
@@ -130,6 +131,27 @@ export const updateUserPasswordController = async (
         })),
       });
     } else if (error instanceof Error) {
+      console.log(error.message);
+      res.status(500).json({
+        message:
+          'Internal server error, check server console for more information',
+      });
+    }
+  }
+};
+
+export const getParticipatedProjects = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
+
+    const participatedProjects = await getSharedProjects(userId);
+
+    res.status(200).json(participatedProjects);
+  } catch (error) {
+    if (error instanceof Error) {
       console.log(error.message);
       res.status(500).json({
         message:
