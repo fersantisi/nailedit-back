@@ -24,7 +24,7 @@ export const createNewProject = async (
   try {
     const userId = await getTokenPayload(req.cookies.authToken).userId;
 
-    const { name, description, category, image, dueDate } = req.body;
+    const { name, description, category, image, dueDate, privacy } = req.body;
 
     console.log(dueDate);
 
@@ -35,6 +35,7 @@ export const createNewProject = async (
       image,
       dueDate,
       userId,
+      privacy
     );
 
     await validateOrReject(project);
@@ -123,12 +124,12 @@ export const updateAProject = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { name, description, category, image, dueDate } = req.body;
+    const { name, privacy, description, category, image, dueDate } = req.body;
 
     const projectIdStr = req.params.projectId;
     const projectIdNumber = +projectIdStr;
 
-    // Validate that project due date update doesn't conflict with existing goals and tasks
+
     const validationResult = await validateProjectDueDateUpdate(
       projectIdNumber,
       dueDate,
@@ -144,6 +145,7 @@ export const updateAProject = async (
 
     const project: UpdateProjectDto = new UpdateProjectDto(
       name,
+      privacy,
       description,
       category,
       image,

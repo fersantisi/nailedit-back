@@ -32,6 +32,7 @@ export const createProject = async (project: ProjectDto) => {
       image: project.image,
       dueDate: project.dueDate,
       userId: project.userId,
+      privacy: project.privacy
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -182,6 +183,7 @@ export const getProject = async (
       project.updated_at,
       project.userId,
       ownerDto,
+      project.privacy
     );
 
     return projectDataDTO;
@@ -226,6 +228,7 @@ export const getProjectsByUserIdService = async (
         project.updated_at,
         project.userId,
         ownerDto,
+        project.privacy
       );
     });
 
@@ -249,6 +252,7 @@ export const updateProject = async (newData: UpdateProjectDto) => {
   project.category = newData.category;
   project.image = newData.image;
   project.dueDate = newData.dueDate;
+  project.privacy = newData.privacy;
   await project.save();
 };
 
@@ -306,6 +310,7 @@ export const getAllProjects = async (
         project.updated_at,
         project.userId,
         ownerDto,
+        project.privacy
       );
     });
 
@@ -366,6 +371,7 @@ export const searchProjects = async (
       project.updated_at,
       project.userId,
       ownerDto,
+      project.privacy
     );
   });
 
@@ -415,6 +421,7 @@ export const getSharedProjects = async (
         project.updated_at,
         project.userId,
         ownerDto,
+        project.privacy
       );
     });
     return projectDataDTOs;
