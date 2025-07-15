@@ -1,5 +1,13 @@
-import { Table, Column, DataType, Model, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
-import User from "./User"
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
+} from 'sequelize-typescript';
+import User from './User';
 import Stock from './Stock';
 
 @Table({
@@ -15,8 +23,9 @@ class ShoppingList extends Model {
   })
   declare id: number;
 
+  @ForeignKey(() => Stock)
   @Column({
-  type: DataType.STRING,
+    type: DataType.INTEGER,
   })
   declare itemid: number;
 
@@ -47,11 +56,9 @@ class ShoppingList extends Model {
   declare user: User;
 
   @BelongsTo(() => Stock, {
-  onDelete: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   declare stock: Stock;
 }
 
-
-
-export default ShoppingList
+export default ShoppingList;
