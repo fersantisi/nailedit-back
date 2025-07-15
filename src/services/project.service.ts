@@ -269,9 +269,14 @@ export const getProjectByIdService = async (
   }
 };
 
-export const getAllProjects = async (): Promise<ProjectDataDto[]> => {
+export const getAllProjects = async (
+  page: number = 1,
+  limit: number = 3,
+) => {
+  const offset = (page - 1) * limit;
+
   try {
-    const projects = await Project.findAll({
+    const { count, rows } = await Project.findAndCountAll({
       include: [
         {
           model: User,
@@ -279,8 +284,11 @@ export const getAllProjects = async (): Promise<ProjectDataDto[]> => {
           attributes: ['id', 'username', 'email'],
         },
       ],
+      offset,
+      limit,
     });
-    const projectDataDTOs: ProjectDataDto[] = projects.map((project) => {
+
+    const projectDataDTOs: ProjectDataDto[] = rows.map((project) => {
       const ownerDto = new UserBasicDto(
         project.user.id,
         project.user.username,
@@ -300,7 +308,13 @@ export const getAllProjects = async (): Promise<ProjectDataDto[]> => {
         ownerDto,
       );
     });
-    return projectDataDTOs;
+
+    return {
+      total: count,
+      page,
+      totalPages: Math.ceil(count / limit),
+      results: projectDataDTOs,
+    };
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
@@ -312,7 +326,7 @@ export const getAllProjects = async (): Promise<ProjectDataDto[]> => {
 export const searchProjects = async (
   query: string,
   page: number = 1,
-  limit: number = 10,
+  limit: number = 3,
 ) => {
   const offset = (page - 1) * limit;
 

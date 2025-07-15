@@ -80,9 +80,11 @@ export const getAllExistingProjects = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const userId = Number(req.params.id);
-    const projects = await getAllProjects();
-    res.status(200).json(projects);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 3;
+
+    const result = await getAllProjects(page, limit);
+    res.status(200).json(result);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
