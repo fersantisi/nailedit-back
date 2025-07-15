@@ -40,6 +40,19 @@ export const acceptParticipationRequest = async (
     if (!request) {
       throw new Error('Participation request not found');
     }
+
+    // Check if user is already a participant
+    const existingParticipant = await ProjectParticipant.findOne({
+      where: {
+        projectId: request.projectId,
+        userId: request.userId,
+      },
+    });
+
+    if (existingParticipant) {
+      throw new Error('User is already a participant in this project');
+    }
+
     await ProjectParticipant.create({
       projectId: request.projectId,
       userId: request.userId,
@@ -47,6 +60,13 @@ export const acceptParticipationRequest = async (
     await request.destroy();
   } catch (error) {
     if (error instanceof Error) {
+      // Handle unique constraint violation more gracefully
+      if (
+        error.message.includes('already exists') ||
+        error.message.includes('unique')
+      ) {
+        throw new Error('User is already a participant in this project');
+      }
       throw new Error(
         `Failed to accept participation request: ${error.message}`,
       );
