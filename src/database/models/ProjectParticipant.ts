@@ -34,8 +34,8 @@ class ProjectParticipant extends Model {
   declare project: Project;
 
   @ForeignKey(() => User)
-  @Column(DataType.INTEGER)
   @Unique('unique_participant')
+  @Column(DataType.INTEGER)
   declare userId: number;
 
   @BelongsTo(() => User)

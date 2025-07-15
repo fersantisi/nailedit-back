@@ -1,7 +1,13 @@
 import { Request, Response } from 'express';
-import { acceptParticipationRequest, getallParticipationRequests, getProjectParticipants, rejectParticipationRequest, removeProjectParticipant, sendRequestParticipation } from '../services/community.service';
+import {
+  acceptParticipationRequest,
+  getallParticipationRequests,
+  getProjectParticipants,
+  rejectParticipationRequest,
+  removeProjectParticipant,
+  sendRequestParticipation,
+} from '../services/community.service';
 import { getAllProjects } from '../services/project.service';
-
 
 export const requestParticipation = async (
   req: Request,
@@ -9,19 +15,19 @@ export const requestParticipation = async (
 ): Promise<void> => {
   try {
     const projectId = Number(req.params.projectId);
+    const { userId } = req.body;
 
-    const userId = Number(req.body);
+    await sendRequestParticipation(projectId, userId);
 
-    sendRequestParticipation(projectId, userId);
-    
-
-    res.status(201).json({ message: 'Participation request sent successfully' });
+    res
+      .status(201)
+      .json({ message: 'Participation request sent successfully' });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   }
-}
+};
 
 export const acceptAParticipationRequest = async (
   req: Request,
@@ -54,8 +60,8 @@ export const rejectAParticipationRequest = async (
 };
 
 export const removeAParticipant = async (
-    req: Request,
-    res: Response,
+  req: Request,
+  res: Response,
 ): Promise<void> => {
   try {
     const projectId = Number(req.params.projectId);
@@ -67,7 +73,7 @@ export const removeAParticipant = async (
       res.status(500).json({ message: error.message });
     }
   }
-}
+};
 
 export const getAllExistingProjects = async (
   req: Request,
@@ -82,11 +88,11 @@ export const getAllExistingProjects = async (
       res.status(500).json({ message: error.message });
     }
   }
-}
+};
 
 export const getAllParticipationRequests = async (
-    req: Request,
-    res: Response,
+  req: Request,
+  res: Response,
 ): Promise<void> => {
   try {
     const projectId = Number(req.params.projectId);
@@ -97,11 +103,11 @@ export const getAllParticipationRequests = async (
       res.status(500).json({ message: error.message });
     }
   }
-}
+};
 
 export const getAllProjectParticipants = async (
-    req: Request,
-    res: Response,
+  req: Request,
+  res: Response,
 ): Promise<void> => {
   try {
     const projectId = Number(req.params.projectId);
@@ -112,4 +118,4 @@ export const getAllProjectParticipants = async (
       res.status(500).json({ message: error.message });
     }
   }
-}
+};

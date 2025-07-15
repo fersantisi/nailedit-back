@@ -8,7 +8,9 @@ import {
   getSharedProjects,
   searchProjects,
   updateProject,
+  checkProjectPermissions,
 } from '../services/project.service';
+import { validateProjectId } from '../utils/validateProjectId';
 import { validateOrReject } from 'class-validator';
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 import { validateProjectDueDateUpdate } from '../utils/validateDueDate';
@@ -172,7 +174,7 @@ export const updateAProject = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-}
+};
 
 export const searchProjectsCommunity = async (req: Request, res: Response) => {
   const q = req.query.q?.toString() || '';
@@ -193,11 +195,41 @@ export const getAllSharedProjects = async (req: Request, res: Response) => {
 
   try {
     const sharedProjects = await getSharedProjects(userId);
-    
+
     res.status(200).json(sharedProjects);
   } catch (error) {
     if (error instanceof Error) {
       res.status(418).json({ message: error.message });
     }
   }
-}
+};
+
+export const checkProjectPermissionsController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectId = validateProjectId(req.params.projectId);
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
+
+    if (projectId === null) {
+      res.status(400).json({ message: 'Invalid project ID provided.' });
+      return;
+    }
+
+    const permissions = await checkProjectPermissions(projectId, userId);
+
+    res.status(200).json({
+      projectId,
+      userId,
+      hasAccess: permissions.hasAccess,
+      role: permissions.role,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};

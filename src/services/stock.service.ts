@@ -3,6 +3,7 @@ import Stock from '../database/models/Stock';
 import { ReserveStockDto } from '../dtos/ReserveStockDto';
 import { StockDto } from '../dtos/StockDto';
 import { UpdateStockDto } from '../dtos/UpdateStockDto';
+import { ReserveStockWithItemDto, StockItemDto } from '../dtos/ReserveStockWithItemDto';
 
 // Helper function to calculate actual reserved quantity for a stock item
 export const calculateReservedQuantity = async (
@@ -175,18 +176,35 @@ export const updateStockWithDto = async (
 
 export const getAllProjectStock = async (
   projectId: number,
-): Promise<ReserveStockDto[]> => {
+): Promise<ReserveStockWithItemDto[]> => {
   try {
     const reservedStock = await ReservedStock.findAll({
       where: { projectId: projectId },
+      include: [
+        {
+          model: Stock,
+          as: 'stock',
+          attributes: ['id', 'itemName', 'unit', 'quantity', 'reserved'],
+        },
+      ],
     });
-    const reservedStockDTOs: ReserveStockDto[] = reservedStock.map(
+    
+    const reservedStockDTOs: ReserveStockWithItemDto[] = reservedStock.map(
       (reserved) => {
-        return new ReserveStockDto(
+        const stockItemDto = new StockItemDto(
+          reserved.stock.id,
+          reserved.stock.itemName,
+          reserved.stock.unit,
+          reserved.stock.quantity,
+          reserved.stock.reserved,
+        );
+
+        return new ReserveStockWithItemDto(
           reserved.id,
           reserved.stockId,
           reserved.projectId,
           reserved.quantity,
+          stockItemDto,
         );
       },
     );

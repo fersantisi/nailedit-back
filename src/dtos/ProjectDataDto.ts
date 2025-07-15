@@ -7,6 +7,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
+import { UserBasicDto } from './UserBasicDto';
 
 export class ProjectDataDto {
   @IsNumber()
@@ -40,6 +41,11 @@ export class ProjectDataDto {
   @IsDate()
   declare updatedDate: Date;
 
+  @IsNumber()
+  declare userId: number;
+
+  declare owner: UserBasicDto;
+
   constructor(
     id: number,
     name: string,
@@ -49,6 +55,8 @@ export class ProjectDataDto {
     dueDate: string,
     creationDate: Date,
     updatedDate: Date,
+    userId: number,
+    owner: UserBasicDto,
   ) {
     this.id = id;
     this.name = name;
@@ -58,5 +66,7 @@ export class ProjectDataDto {
     this.dueDate = dueDate;
     this.creationDate = creationDate;
     this.updatedDate = updatedDate;
+    this.userId = userId;
+    this.owner = owner;
   }
 }

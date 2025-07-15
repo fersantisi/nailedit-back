@@ -4,6 +4,7 @@ import { getTokenPayload } from '../services/token.service';
 import { StockDto } from '../dtos/StockDto';
 import { UpdateStockDto } from '../dtos/UpdateStockDto';
 import { ReserveStockDto } from '../dtos/ReserveStockDto';
+import { ReserveStockWithItemDto } from '../dtos/ReserveStockWithItemDto';
 import {
   createStock,
   deleteStock,
@@ -25,7 +26,7 @@ export const getAllProjectReservedStock = async (
     const projectId = req.params.id;
     const projectIdNumber = +projectId;
 
-    const reservedStock: ReserveStockDto[] =
+    const reservedStock: ReserveStockWithItemDto[] =
       await getAllProjectStock(projectIdNumber);
     res.status(200).json(reservedStock);
   } catch (error) {
