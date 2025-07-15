@@ -58,7 +58,7 @@ const router = Router();
 
 //project routes
 router.post('/create', createNewProject);
-router.delete('/delete/:id', checkProjectOwnership, deleteAProject);
+router.delete('/delete/:projectId', checkProjectOwnership, deleteAProject);
 router.get('/list', getProjectsByUserId);
 router.put('/:projectId/updateProject', updateAProject);
 router.get('/:projectId', getAProject);

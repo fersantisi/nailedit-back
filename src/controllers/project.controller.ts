@@ -67,7 +67,7 @@ export const deleteAProject = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const projectId = req.params.id;
+    const projectId = req.params.projectId;
     console.log(projectId);
     await deleteProject(projectId);
     res.status(200).json({
