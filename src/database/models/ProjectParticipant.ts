@@ -14,12 +14,6 @@ import Project from './Project';
   tableName: 'project_participants',
   modelName: 'ProjectParticipant',
   timestamps: false,
-  indexes: [
-    {
-      unique: true,
-      fields: ['projectId', 'userId'],
-    },
-  ],
 })
 class ProjectParticipant extends Model {
   static rejectParticipationRequest(requestId: number) {
