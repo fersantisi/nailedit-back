@@ -281,6 +281,7 @@ export const getAllProjects = async (
 
   try {
     const { count, rows } = await Project.findAndCountAll({
+      where: { privacy: false },
       include: [
         {
           model: User,
