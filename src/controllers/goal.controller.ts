@@ -26,15 +26,6 @@ export const createNewGoal = async (
 
     const { name, description, dueDate } = req.body;
 
-    // Validate that goal due date is not later than project due date
-    const isDueDateValid = await validateGoalDueDate(projectIdNumber, dueDate);
-    if (!isDueDateValid) {
-      res.status(400).json({
-        message: 'Goal due date cannot be later than the project due date',
-      });
-      return;
-    }
-
     const goal: GoalDto = new GoalDto(
       name,
       description,

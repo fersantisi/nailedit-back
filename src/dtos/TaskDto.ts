@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  ValidateIf,
 } from 'class-validator';
 
 export class TaskDto {
@@ -20,7 +21,8 @@ export class TaskDto {
   declare label: string;
 
   @IsOptional()
-  @IsDateString()
+  @ValidateIf((o) => o.dueDate !== undefined && o.dueDate !== '')
+  @IsDateString({}, { message: 'Due date must be a valid date string' })
   declare dueDate: string;
 
   @IsNotEmpty()

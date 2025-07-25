@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class UpdateProjectDto {
@@ -26,7 +27,8 @@ export class UpdateProjectDto {
   declare image: string;
 
   @IsOptional()
-  @IsDateString()
+  @ValidateIf((o) => o.dueDate !== undefined && o.dueDate !== '')
+  @IsDateString({}, { message: 'Due date must be a valid date string' })
   declare dueDate: string;
 
   @IsNotEmpty()

@@ -14,6 +14,7 @@ import { UserBasicDto } from '../dtos/UserBasicDto';
 import { unreserveStock } from './stock.service';
 import { Op } from 'sequelize';
 import ProjectParticipant from '../database/models/ProjectParticipant';
+import { validateProjectDueDateUpdate } from '../utils/validateDueDate';
 
 export const createProject = async (project: ProjectDto) => {
   try {
@@ -244,6 +245,13 @@ export const updateProject = async (newData: UpdateProjectDto) => {
   if (!project) {
     throw error('Project not found');
   }
+
+  // Validate that the new project due date doesn't conflict with existing goals and tasks
+  const validation = await validateProjectDueDateUpdate(newData.projectId, newData.dueDate);
+  if (!validation.isValid) {
+    throw new Error(`Cannot update project due date. ${validation.conflicts.join(', ')}`);
+  }
+
   project.name = newData.name;
   project.description = newData.description;
   project.category = newData.category;

@@ -7,9 +7,19 @@ export const validateGoalDueDate = async (
   goalDueDate: string,
 ): Promise<boolean> => {
   try {
+    // Handle undefined or empty due dates
+    if (goalDueDate == undefined || goalDueDate === '') {
+      return true;
+    }
+
     const project = await Project.findByPk(projectId);
     if (!project) {
       throw new Error('Project not found');
+    }
+
+    // If project has no due date, any goal due date is valid
+    if (project.dueDate == undefined || project.dueDate === '') {
+      return true;
     }
 
     const projectDueDate = new Date(project.dueDate);
@@ -28,12 +38,18 @@ export const validateTaskDueDate = async (
   taskDueDate: string,
 ): Promise<boolean> => {
   try {
-    if (taskDueDate == undefined) {
+    // Handle undefined or empty due dates
+    if (taskDueDate == undefined || taskDueDate === '') {
       return true;
     }
     const goal = await Goal.findByPk(goalId);
     if (!goal) {
       throw new Error('Goal not found');
+    }
+
+    // If goal has no due date, any task due date is valid
+    if (goal.dueDate == undefined || goal.dueDate === '') {
+      return true;
     }
 
     const goalDueDate = new Date(goal.dueDate);
@@ -97,6 +113,53 @@ export const validateProjectDueDateUpdate = async (
     return {
       isValid: false,
       conflicts: ['Error validating project due date update'],
+    };
+  }
+};
+
+export const validateGoalDueDateUpdate = async (
+  goalId: number,
+  newGoalDueDate: string,
+): Promise<{ isValid: boolean; conflicts: string[] }> => {
+  try {
+    const goal = await Goal.findByPk(goalId);
+    if (!goal) {
+      throw new Error('Goal not found');
+    }
+
+    // Handle undefined or empty due dates - if goal has no due date, any task due date is valid
+    if (newGoalDueDate == undefined || newGoalDueDate === '') {
+      return { isValid: true, conflicts: [] };
+    }
+
+    const newDueDate = new Date(newGoalDueDate);
+    const conflicts: string[] = [];
+
+    // Check all tasks in this goal
+    const tasks = await Task.findAll({
+      where: { goalId: goalId },
+    });
+
+    for (const task of tasks) {
+      if (task.dueDate && task.dueDate !== '') {
+        const taskDueDate = new Date(task.dueDate);
+        if (taskDueDate > newDueDate) {
+          conflicts.push(
+            `Task "${task.name}" has due date ${task.dueDate} which is later than the new goal due date`,
+          );
+        }
+      }
+    }
+
+    return {
+      isValid: conflicts.length === 0,
+      conflicts,
+    };
+  } catch (error) {
+    console.error('Error validating goal due date update:', error);
+    return {
+      isValid: false,
+      conflicts: ['Error validating goal due date update'],
     };
   }
 };

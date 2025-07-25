@@ -12,7 +12,6 @@ import {
   getTaskWithGoalId,
 } from '../services/task.service';
 import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
-import { validateTaskDueDate } from '../utils/validateDueDate';
 import Task from '../database/models/Task';
 import Goal from '../database/models/Goal';
 
@@ -27,17 +26,6 @@ export const createNewTask = async (
     const { name, description, label, dueDate } = req.body;
 
     console.log(dueDate);
-
-    // Validate that task due date is not later than goal due date only if dueDate is provided
-    if (dueDate) {
-      const isDueDateValid = await validateTaskDueDate(goalIdNumber, dueDate);
-      if (!isDueDateValid) {
-        res.status(400).json({
-          message: 'Task due date cannot be later than the goal due date',
-        });
-        return;
-      }
-    }
 
     const task: TaskDto = new TaskDto(
       name,
@@ -134,27 +122,6 @@ export const updateATask = async (
     const { name, description, label, dueDate } = req.body;
     const taskIdStr = req.params.taskId;
     const taskIdNumber = +taskIdStr;
-
-    // Get the task to find its goal ID
-    const task = await getTaskWithGoalId(taskIdStr);
-    if (!task) {
-      res.status(404).json({ message: 'Task not found' });
-      return;
-    }
-
-    // Get the goal ID from the task
-    const goalId = task.goalId;
-
-    // Validate that task due date is not later than goal due date only if dueDate is provided
-    if (dueDate) {
-      const isDueDateValid = await validateTaskDueDate(goalId, dueDate);
-      if (!isDueDateValid) {
-        res.status(400).json({
-          message: 'Task due date cannot be later than the goal due date',
-        });
-        return;
-      }
-    }
 
     const taskUpdate: UpdateTaskDto = new UpdateTaskDto(
       name,
