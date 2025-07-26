@@ -5,6 +5,7 @@ import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
 import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
 import Goal from '../database/models/Goal';
 import Project from '../database/models/Project';
+import { validateTaskDueDate } from '../utils/validateDueDate';
 
 export const createTask = async (task: TaskDto) => {
   try {
@@ -14,6 +15,12 @@ export const createTask = async (task: TaskDto) => {
 
     if (existingTask) {
       throw new Error('task name already in use.');
+    }
+
+    // Validate that the task due date doesn't exceed the goal's due date
+    const isDueDateValid = await validateTaskDueDate(task.goalId, task.dueDate);
+    if (!isDueDateValid) {
+      throw new Error('Task due date cannot be later than the goal due date');
     }
 
     const newTask = await Task.create({
@@ -26,7 +33,7 @@ export const createTask = async (task: TaskDto) => {
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
-      throw new Error('Task name already in use.');
+      throw new Error(error.message);
     }
   }
 };
@@ -114,6 +121,15 @@ export const updateTask = async (newData: UpdateTaskDto) => {
 
   if (!task) {
     throw Error('task not found');
+  }
+
+  // Validate that the new task due date doesn't exceed the goal's due date
+  const isDueDateValid = await validateTaskDueDate(
+    task.goalId,
+    newData.dueDate,
+  );
+  if (!isDueDateValid) {
+    throw new Error('Task due date cannot be later than the goal due date');
   }
 
   task.name = newData.name;

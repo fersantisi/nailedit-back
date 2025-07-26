@@ -17,7 +17,7 @@ import Project from './Project';
 })
 class ProjectParticipant extends Model {
   static rejectParticipationRequest(requestId: number) {
-      throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.');
   }
   @Column({
     primaryKey: true,
@@ -34,7 +34,6 @@ class ProjectParticipant extends Model {
   declare project: Project;
 
   @ForeignKey(() => User)
-  @Unique('unique_participant')
   @Column(DataType.INTEGER)
   declare userId: number;
 

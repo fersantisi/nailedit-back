@@ -13,6 +13,7 @@ import { getTokenPayload } from '../services/token.service';
 import { validateOrReject } from 'class-validator';
 import { UpdatePasswordDto } from '../dtos/UserProfileDto';
 import { getSharedProjects } from '../services/project.service';
+import { getUserParticipationRequests } from '../services/community.service';
 
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id;
@@ -150,6 +151,27 @@ export const getParticipatedProjects = async (
     const participatedProjects = await getSharedProjects(userId);
 
     res.status(200).json(participatedProjects);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+      res.status(500).json({
+        message:
+          'Internal server error, check server console for more information',
+      });
+    }
+  }
+};
+
+export const getUserPendingRequests = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
+
+    const pendingRequests = await getUserParticipationRequests(userId);
+
+    res.status(200).json(pendingRequests);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);

@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  ValidateIf,
 } from 'class-validator';
 
 export class GoalDto {
@@ -16,7 +17,8 @@ export class GoalDto {
   declare description: string;
 
   @IsOptional()
-  @IsDateString()
+  @ValidateIf((o) => o.dueDate !== undefined && o.dueDate !== '')
+  @IsDateString({}, { message: 'Due date must be a valid date string' })
   declare dueDate: string;
 
   @IsNotEmpty()

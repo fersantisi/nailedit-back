@@ -13,7 +13,7 @@ import {
 import { validateProjectId } from '../utils/validateProjectId';
 import { validateOrReject } from 'class-validator';
 import { UpdateProjectDto } from '../dtos/UpdateProjectDto';
-import { validateProjectDueDateUpdate } from '../utils/validateDueDate';
+
 import { ProjectDto } from '../dtos/ProjectDto';
 import { ProjectDataDto } from '../dtos/ProjectDataDto';
 
@@ -68,7 +68,7 @@ export const deleteAProject = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const projectId = req.params.id;
+    const projectId = req.params.projectId;
     console.log(projectId);
     await deleteProject(projectId);
     res.status(200).json({
@@ -128,20 +128,6 @@ export const updateAProject = async (
 
     const projectIdStr = req.params.projectId;
     const projectIdNumber = +projectIdStr;
-
-
-    const validationResult = await validateProjectDueDateUpdate(
-      projectIdNumber,
-      dueDate,
-    );
-    if (!validationResult.isValid) {
-      res.status(400).json({
-        message:
-          'Project due date update conflicts with existing goals or tasks',
-        conflicts: validationResult.conflicts,
-      });
-      return;
-    }
 
     const project: UpdateProjectDto = new UpdateProjectDto(
       name,

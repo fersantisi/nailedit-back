@@ -1,8 +1,10 @@
 import Goal from '../database/models/Goal';
+import Task from '../database/models/Task';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { GoalDto } from '../dtos/GoalDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
 import Project from '../database/models/Project';
+import { validateGoalDueDateUpdate, validateGoalDueDate } from '../utils/validateDueDate';
 
 export const createGoal = async (goal: GoalDto) => {
   try {
@@ -12,6 +14,12 @@ export const createGoal = async (goal: GoalDto) => {
 
     if (existingGoal) {
       throw new Error('Goal name already in use.');
+    }
+
+    // Validate that the goal due date doesn't exceed the project's due date
+    const isDueDateValid = await validateGoalDueDate(goal.projectId, goal.dueDate);
+    if (!isDueDateValid) {
+      throw new Error('Goal due date cannot be later than the project due date');
     }
 
     const newGoal = await Goal.create({
@@ -24,7 +32,7 @@ export const createGoal = async (goal: GoalDto) => {
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
-      throw new Error('Goal name already in use.');
+      throw new Error(error.message);
     }
   }
 };
@@ -103,8 +111,20 @@ export const updateGoal = async (newData: UpdateGoalDto) => {
   const goal = await Goal.findByPk(newData.goalId);
 
   if (!goal) {
-    throw Error('Project not found');
+    throw Error('Goal not found');
   }
+
+  // Validate that the new goal due date doesn't conflict with existing tasks
+  const validation = await validateGoalDueDateUpdate(
+    newData.goalId,
+    newData.dueDate,
+  );
+  if (!validation.isValid) {
+    throw new Error(
+      `Cannot update goal due date. ${validation.conflicts.join(', ')}`,
+    );
+  }
+
   goal.name = newData.name;
   goal.description = newData.description;
   goal.dueDate = newData.dueDate;
