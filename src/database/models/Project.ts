@@ -15,10 +15,11 @@ import {
 } from 'sequelize-typescript';
 import User from './User';
 import Goal from './Goal';
-import Note from "./Note";
-import ReservedStock from "./ReservedStock";
-import Stock from "./ReservedStock";
+import Note from './Note';
+import ReservedStock from './ReservedStock';
+import Stock from './ReservedStock';
 import File from './File';
+import ProjectParticipant from './ProjectParticipant';
 
 @Table({
   timestamps: true,
@@ -84,9 +85,11 @@ class Project extends Model {
   @HasMany(() => ReservedStock)
   declare resrvedStock: ReservedStock[];
 
-
   @HasMany(() => File)
   declare files: File[];
+
+  @HasMany(() => ProjectParticipant)
+  declare participants: ProjectParticipant[];
 }
 
 export default Project;

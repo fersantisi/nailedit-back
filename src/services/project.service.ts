@@ -247,9 +247,14 @@ export const updateProject = async (newData: UpdateProjectDto) => {
   }
 
   // Validate that the new project due date doesn't conflict with existing goals and tasks
-  const validation = await validateProjectDueDateUpdate(newData.projectId, newData.dueDate);
+  const validation = await validateProjectDueDateUpdate(
+    newData.projectId,
+    newData.dueDate,
+  );
   if (!validation.isValid) {
-    throw new Error(`Cannot update project due date. ${validation.conflicts.join(', ')}`);
+    throw new Error(
+      `Cannot update project due date. ${validation.conflicts.join(', ')}`,
+    );
   }
 
   project.name = newData.name;
@@ -277,10 +282,7 @@ export const getProjectByIdService = async (
   }
 };
 
-export const getAllProjects = async (
-  page: number = 1,
-  limit: number = 3,
-) => {
+export const getAllProjects = async (page: number = 1, limit: number = 3) => {
   const offset = (page - 1) * limit;
 
   try {
