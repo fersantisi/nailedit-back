@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsArray,
   IsDate,
   IsDateString,
@@ -19,6 +20,10 @@ export class ProjectDataDto {
   @IsString()
   @IsNotEmpty({ message: 'Name is requiered' })
   declare name: string;
+
+  @IsBoolean()
+  @IsNotEmpty({ message: 'Privacy is requiered' })
+  declare privacy: boolean;
 
   @IsOptional()
   @IsString()
@@ -66,6 +71,7 @@ export class ProjectDataDto {
     updatedDate: Date,
     userId: number,
     owner: UserBasicDto,
+    privacy: boolean,
     notifications?: NotificationDto[],
   ) {
     this.id = id;
@@ -78,6 +84,7 @@ export class ProjectDataDto {
     this.updatedDate = updatedDate;
     this.userId = userId;
     this.owner = owner;
+    this.privacy = privacy;
     this.notifications = notifications ?? [];
   }
 }
