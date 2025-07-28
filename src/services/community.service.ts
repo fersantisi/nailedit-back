@@ -202,18 +202,35 @@ export const sendInvitation = async (
   toUser: number,
 ): Promise<void> => {
   try {
+    const user = await User.findOne({
+      where: {
+        username: toUser,
+      },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
     const participant = await ProjectParticipant.findOne({
       where: {
         projectId: projectId,
-        userId: toUser,
+        userId: user.id,
       },
     });
     if (participant) {
       throw new Error('User is already a participant in this project');
     }
+    const existingInvite = await ProjectInvitation.findOne({
+      where: {
+        projectId: projectId,
+        toUser: user.id,
+      },
+    });
+    if (existingInvite) {
+      throw new Error('User already has an invitation to this project');
+    }
     await ProjectInvitation.create({
       projectId: projectId,
-      toUser: toUser,
+      toUser: user.id,
       fromUser: fromUser,
     });
   } catch (error) {
