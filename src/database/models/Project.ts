@@ -15,6 +15,7 @@ import Note from './Note';
 import ReservedStock from './ReservedStock';
 import File from './File';
 import ProjectParticipant from './ProjectParticipant';
+import ProjectNotification from './ProjectNotification';
 
 @Table({
   timestamps: true,
@@ -85,6 +86,9 @@ class Project extends Model {
 
   @HasMany(() => ProjectParticipant)
   declare participants: ProjectParticipant[];
+
+  @HasMany(() => ProjectNotification)
+  declare notifications: ProjectNotification[];
 }
 
 export default Project;

@@ -9,6 +9,9 @@ import {
   searchProjects,
   updateProject,
   checkProjectPermissions,
+  createProjectReminder,
+  updateProjectReminder,
+  removeProjectReminder,
 } from '../services/project.service';
 import { validateProjectId } from '../utils/validateProjectId';
 import { validateOrReject } from 'class-validator';
@@ -210,6 +213,70 @@ export const checkProjectPermissionsController = async (
       userId,
       hasAccess: permissions.hasAccess,
       role: permissions.role,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};
+
+export const createNewProjectReminder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectId = Number(req.params.projectId);
+    const notificationTime = req.body;
+
+    await createProjectReminder(projectId, notificationTime);
+
+    res.status(200).json({
+      message: 'Reminder created.',
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};
+
+export const updateAProjectReminder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+
+    const {reminderId , notificationTime} = req.body;
+    await updateProjectReminder(reminderId, notificationTime);
+
+    res.status(200).json({
+      message: 'Reminder updated.',
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};
+
+export const deleteAProjectReminder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const remainderId = req.body;
+
+    await removeProjectReminder(remainderId);
+
+    res.status(200).json({
+      message: 'Reminder deleted.',
     });
   } catch (error) {
     if (error instanceof Error) {

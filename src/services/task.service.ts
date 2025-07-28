@@ -6,6 +6,8 @@ import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
 import Goal from '../database/models/Goal';
 import Project from '../database/models/Project';
 import { validateTaskDueDate } from '../utils/validateDueDate';
+import TaskNotification from '../database/models/TaskNotification';
+import { NotificationDto } from '../dtos/NotificationDto';
 
 export const createTask = async (task: TaskDto) => {
   try {
@@ -55,7 +57,9 @@ export const deleteTask = async (taskId: string) => {
 
 export const gettask = async (taskId: string): Promise<TaskDataDto> => {
   try {
-    const task = await Task.findByPk(taskId);
+    const task = await Task.findByPk(taskId,
+      {include: [{model:TaskNotification}]}
+    );
     if (!task) {
       throw new Error('task not found');
     }
@@ -70,6 +74,7 @@ export const gettask = async (taskId: string): Promise<TaskDataDto> => {
       task.created_at,
       task.updated_at,
       task.completed,
+      task.notifications.map((n) => new NotificationDto(n.id, n.notificationTime)),
     );
 
     return taskDto;
@@ -197,3 +202,70 @@ export const getTaskWithGoalId = async (taskId: string) => {
     throw new Error('Server error, check server console for more information');
   }
 };
+
+export const createTaskReminder = async (
+  taskId: number,
+  notificationTime: number,
+):Promise<void> => {
+  try {
+    const existingReminder = await TaskNotification.findOne({where: {tasklId: taskId, notificationTime: notificationTime }});
+
+    if (existingReminder) {
+      throw new Error('Reminder already exists.');
+    };
+
+    TaskNotification.create({
+      taskId,
+      notificationTime,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+};
+
+export const updateTaskReminder = async (
+  reminderId: number,
+  notificationTime: number,
+):Promise<void> => {
+  try {
+
+    const existingReminder = await TaskNotification.findByPk(reminderId);
+
+    if (!existingReminder) {
+      throw new Error('Reminder not found.');
+    };
+
+    existingReminder.notificationTime = notificationTime;
+    await existingReminder.save();
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+};
+
+export const removeTaskReminder= async(
+  reminderId: number
+):Promise<void> => {
+  try {
+
+    const existingReminder = await TaskNotification.findByPk(reminderId);
+
+    if (!existingReminder) {
+      throw new Error('Reminder not found.');
+    };
+
+    existingReminder.destroy();
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+}

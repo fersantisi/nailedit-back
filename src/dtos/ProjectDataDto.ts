@@ -1,13 +1,16 @@
 import {
+  IsArray,
   IsDate,
   IsDateString,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  MinLength,
+  ValidateNested,
 } from 'class-validator';
 import { UserBasicDto } from './UserBasicDto';
+import { Type } from 'class-transformer';
+import { NotificationDto } from './NotificationDto';
 
 export class ProjectDataDto {
   @IsNumber()
@@ -46,6 +49,12 @@ export class ProjectDataDto {
 
   declare owner: UserBasicDto;
 
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => NotificationDto)
+  notifications: NotificationDto[];
+
   constructor(
     id: number,
     name: string,
@@ -57,6 +66,7 @@ export class ProjectDataDto {
     updatedDate: Date,
     userId: number,
     owner: UserBasicDto,
+    notifications?: NotificationDto[],
   ) {
     this.id = id;
     this.name = name;
@@ -68,5 +78,6 @@ export class ProjectDataDto {
     this.updatedDate = updatedDate;
     this.userId = userId;
     this.owner = owner;
+    this.notifications = notifications ?? [];
   }
 }

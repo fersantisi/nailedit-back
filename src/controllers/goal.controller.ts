@@ -9,6 +9,9 @@ import {
   updateGoal,
   getGoalWithProjectId,
   getAllGoals,
+  updateGoalReminder,
+  removeGoalReminder,
+  createGoalReminder,
 } from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
@@ -223,5 +226,69 @@ export const setGoalCompleted = async (
     res.status(200).json({ message: 'Goal completion updated', completed });
   } catch (error) {
     res.status(500).json({ message: 'Error updating goal completion' });
+  }
+};
+
+export const createNewGoalReminder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const goalId = Number(req.params.goalId);
+    const notificationTime = req.body;
+
+    await createGoalReminder(goalId, notificationTime);
+
+    res.status(200).json({
+      message: 'Reminder created.',
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};
+
+export const updateAGoalReminder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+
+    const {reminderId , notificationTime} = req.body;
+    await updateGoalReminder(reminderId, notificationTime);
+
+    res.status(200).json({
+      message: 'Reminder updated.',
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};
+
+export const deleteAGoalReminder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const remainderId = req.body;
+
+    await removeGoalReminder(remainderId);
+
+    res.status(200).json({
+      message: 'Reminder deleted.',
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
   }
 };

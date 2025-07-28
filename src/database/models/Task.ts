@@ -11,6 +11,7 @@ import {
 } from 'sequelize-typescript';
 import Goal from './Goal';
 import Note from './Note';
+import GoalNotification from './GoalNotification';
 
 @Table({
   timestamps: true,
@@ -73,6 +74,9 @@ class Task extends Model {
 
   @HasMany(() => Note)
   declare note: Note[];
+  
+  @HasMany(() => GoalNotification)
+  declare notifications: GoalNotification[];
 }
 
 export default Task;

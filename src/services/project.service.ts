@@ -15,6 +15,8 @@ import { unreserveStock } from './stock.service';
 import { Op } from 'sequelize';
 import ProjectParticipant from '../database/models/ProjectParticipant';
 import { validateProjectDueDateUpdate } from '../utils/validateDueDate';
+import ProjectNotification from '../database/models/ProjectNotification';
+import { NotificationDto } from '../dtos/NotificationDto';
 
 export const createProject = async (project: ProjectDto) => {
   try {
@@ -159,7 +161,9 @@ export const getProject = async (
           model: User,
           as: 'user',
           attributes: ['id', 'username', 'email'],
-        },
+        },{
+          model: ProjectNotification,
+        }
       ],
     });
     if (!project) {
@@ -183,6 +187,7 @@ export const getProject = async (
       project.updated_at,
       project.userId,
       ownerDto,
+      project.notifications.map((n) => new NotificationDto(n.id, n.notificationTime)),
     );
 
     return projectDataDTO;
@@ -205,7 +210,7 @@ export const getProjectsByUserIdService = async (
           model: User,
           as: 'user',
           attributes: ['id', 'username', 'email'],
-        },
+        }
       ],
     });
 
@@ -269,7 +274,11 @@ export const getProjectByIdService = async (
   projectId: string,
 ): Promise<Project | null> => {
   try {
-    const project = await Project.findByPk(projectId);
+    const project = await Project.findByPk(projectId,{
+      include: [{
+        model: ProjectNotification,
+      }]
+    });
     if (!project) {
       throw new Error('Project not found');
     }
@@ -404,7 +413,10 @@ export const getSharedProjects = async (
           model: User,
           as: 'user',
           attributes: ['id', 'username', 'email'],
-        },
+        },{
+          model: ProjectNotification,
+          attributes: ['notificationTime'],
+        }
       ],
     });
     const projectDataDTOs: ProjectDataDto[] = projects.map((project) => {
@@ -472,3 +484,68 @@ export const checkProjectPermissions = async (
     throw new Error('Server error while checking project permissions');
   }
 };
+
+export const createProjectReminder = async (
+  projectId: number,
+  notificationTime: number,
+):Promise<void> => {
+  try {
+    const existingReminder = await ProjectNotification.findOne({where: {projectId: projectId, notificationTime: notificationTime }});
+
+    if (existingReminder) {
+      throw new Error('Reminder already exists.');
+    };
+
+    ProjectNotification.create({
+      projectId,
+      notificationTime,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+};
+
+export const updateProjectReminder = async (
+  reminderId: number,
+  notificationTime: number,
+):Promise<void> => {
+  try {
+
+    const existingReminder = await ProjectNotification.findByPk(reminderId);
+    if (!existingReminder) {
+      throw new Error('Reminder not found.');
+    };
+
+    existingReminder.notificationTime = notificationTime;
+    await existingReminder.save();
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+};
+
+export const removeProjectReminder= async(
+  reminderId: number
+):Promise<void> => {
+  try {
+
+    const existingReminder = await ProjectNotification.findByPk(reminderId);
+    if (!existingReminder) {
+      throw new Error('Reminder not found.');
+    };
+
+    existingReminder.destroy();
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+}

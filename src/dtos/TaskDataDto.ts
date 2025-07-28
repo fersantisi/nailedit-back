@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsDate,
   IsDateString,
@@ -6,7 +7,10 @@ import {
   IsOptional,
   IsString,
   IsBoolean,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { NotificationDto } from './NotificationDto';
 
 export class TaskDataDto {
   @IsNumber()
@@ -43,6 +47,12 @@ export class TaskDataDto {
   @IsBoolean()
   declare completed: boolean;
 
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => NotificationDto)
+  notifications: NotificationDto[];
+
   constructor(
     taskId: number,
     goalId: number,
@@ -53,6 +63,7 @@ export class TaskDataDto {
     creationDate: Date,
     updatedDate: Date,
     completed: boolean,
+    notifications?: NotificationDto[],
   ) {
     this.id = taskId;
     this.goalId = goalId;
@@ -63,5 +74,6 @@ export class TaskDataDto {
     this.creationDate = creationDate;
     this.updatedDate = updatedDate;
     this.completed = completed;
+    this.notifications = notifications ?? [];
   }
 }
