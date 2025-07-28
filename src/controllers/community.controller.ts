@@ -166,7 +166,7 @@ export const getAllProjectInvites = async (
 ): Promise<void> => {
   try {
     const projectId = Number(req.params.projectId);
-    const invites = getProjectInvites(projectId);
+    const invites = await getProjectInvites(projectId);
     res.status(200).json(invites);
   } catch (error) {
     if (error instanceof Error) {
