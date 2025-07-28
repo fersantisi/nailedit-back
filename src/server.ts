@@ -3,6 +3,9 @@ import config from './config/config';
 import sequelize from './database/database';
 import { createAdmin } from './services/users.service';
 
+//start cron
+import './jobs/email.job';
+
 async function main(): Promise<void> {
   try {
     await sequelize.sync({ alter: false });
