@@ -41,6 +41,11 @@ class Project extends Model {
   declare userId: number;
 
   @Column({
+    type: DataType.BOOLEAN,
+  })
+  declare privacy: boolean;
+
+  @Column({
     type: DataType.STRING,
   })
   declare name: string;
