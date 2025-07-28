@@ -4,6 +4,7 @@ import {
   acceptParticipationRequest,
   deleteInvitation,
   getallParticipationRequests,
+  getProjectInvites,
   getProjectParticipants,
   getUserInvites,
   getUserSentInvites,
@@ -151,6 +152,21 @@ export const getAllSentInvites = async (
   try {
     const userId = await getTokenPayload(req.cookies.authToken).userId;
     const invites = getUserSentInvites(userId);
+    res.status(200).json(invites);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const getAllProjectInvites = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectId = Number(req.params.projectId);
+    const invites = getProjectInvites(projectId);
     res.status(200).json(invites);
   } catch (error) {
     if (error instanceof Error) {

@@ -405,3 +405,49 @@ export const deleteInvitation = async (
     }
   }
 };
+
+export const getProjectInvites = async (
+  projectId: number,
+): Promise<ProjectInvitation[]> => {
+  try {
+    const invites = await ProjectInvitation.findAll({
+      where: { projectId: projectId },
+      include: [
+        {
+          model: Project,
+          as: 'project',
+          attributes: ['id', 'name', 'description', 'category', 'image'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email'],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: 'fromUserData',        
+          attributes: ['id', 'username', 'email'],
+        },
+        {
+          model: User,
+          as: 'toUserData',          
+          attributes: ['id', 'username', 'email'],
+        },
+      ],
+      order: [['created_at', 'DESC']],
+    });
+    return invites;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(
+        `Failed to get user invites: ${error.message}`,
+      );
+    } else {
+      throw new Error(
+        'An unknown error occurred while getting user invites',
+      );
+    }
+  }
+};
