@@ -1,13 +1,9 @@
-import { INTEGER, Optional } from 'sequelize';
 import {
   Table,
   Column,
   DataType,
   Model,
   HasMany,
-  PrimaryKey,
-  AutoIncrement,
-  Unique,
   ForeignKey,
   CreatedAt,
   UpdatedAt,
@@ -17,7 +13,6 @@ import User from './User';
 import Goal from './Goal';
 import Note from './Note';
 import ReservedStock from './ReservedStock';
-import Stock from './ReservedStock';
 import File from './File';
 import ProjectParticipant from './ProjectParticipant';
 
