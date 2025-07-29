@@ -7,8 +7,12 @@ export const validateGoalDueDate = async (
   goalDueDate: string,
 ): Promise<boolean> => {
   try {
-    // Handle undefined or empty due dates
-    if (goalDueDate == undefined || goalDueDate === '') {
+    // Handle undefined, null, or empty due dates
+    if (
+      goalDueDate == undefined ||
+      goalDueDate === null ||
+      goalDueDate === ''
+    ) {
       return true;
     }
 
@@ -18,7 +22,11 @@ export const validateGoalDueDate = async (
     }
 
     // If project has no due date, any goal due date is valid
-    if (project.dueDate == undefined || project.dueDate === '') {
+    if (
+      project.dueDate == undefined ||
+      project.dueDate === null ||
+      project.dueDate === ''
+    ) {
       return true;
     }
 
@@ -38,8 +46,12 @@ export const validateTaskDueDate = async (
   taskDueDate: string,
 ): Promise<boolean> => {
   try {
-    // Handle undefined or empty due dates
-    if (taskDueDate == undefined || taskDueDate === '') {
+    // Handle undefined, null, or empty due dates
+    if (
+      taskDueDate == undefined ||
+      taskDueDate === null ||
+      taskDueDate === ''
+    ) {
       return true;
     }
     const goal = await Goal.findByPk(goalId);
@@ -48,7 +60,11 @@ export const validateTaskDueDate = async (
     }
 
     // If goal has no due date, any task due date is valid
-    if (goal.dueDate == undefined || goal.dueDate === '') {
+    if (
+      goal.dueDate == undefined ||
+      goal.dueDate === null ||
+      goal.dueDate === ''
+    ) {
       return true;
     }
 
@@ -73,6 +89,15 @@ export const validateProjectDueDateUpdate = async (
       throw new Error('Project not found');
     }
 
+    // Handle undefined, null, or empty due dates - if project has no due date, any goal/task due date is valid
+    if (
+      newProjectDueDate == undefined ||
+      newProjectDueDate === null ||
+      newProjectDueDate === ''
+    ) {
+      return { isValid: true, conflicts: [] };
+    }
+
     const newDueDate = new Date(newProjectDueDate);
     const conflicts: string[] = [];
 
@@ -82,11 +107,13 @@ export const validateProjectDueDateUpdate = async (
     });
 
     for (const goal of goals) {
-      const goalDueDate = new Date(goal.dueDate);
-      if (goalDueDate > newDueDate) {
-        conflicts.push(
-          `Goal "${goal.name}" has due date ${goal.dueDate} which is later than the new project due date`,
-        );
+      if (goal.dueDate && goal.dueDate !== null && goal.dueDate !== '') {
+        const goalDueDate = new Date(goal.dueDate);
+        if (goalDueDate > newDueDate) {
+          conflicts.push(
+            `Goal "${goal.name}" has due date ${goal.dueDate} which is later than the new project due date`,
+          );
+        }
       }
 
       // Check all tasks in this goal
@@ -95,11 +122,13 @@ export const validateProjectDueDateUpdate = async (
       });
 
       for (const task of tasks) {
-        const taskDueDate = new Date(task.dueDate);
-        if (taskDueDate > newDueDate) {
-          conflicts.push(
-            `Task "${task.name}" in goal "${goal.name}" has due date ${task.dueDate} which is later than the new project due date`,
-          );
+        if (task.dueDate && task.dueDate !== null && task.dueDate !== '') {
+          const taskDueDate = new Date(task.dueDate);
+          if (taskDueDate > newDueDate) {
+            conflicts.push(
+              `Task "${task.name}" in goal "${goal.name}" has due date ${task.dueDate} which is later than the new project due date`,
+            );
+          }
         }
       }
     }
@@ -127,8 +156,12 @@ export const validateGoalDueDateUpdate = async (
       throw new Error('Goal not found');
     }
 
-    // Handle undefined or empty due dates - if goal has no due date, any task due date is valid
-    if (newGoalDueDate == undefined || newGoalDueDate === '') {
+    // Handle undefined, null, or empty due dates - if goal has no due date, any task due date is valid
+    if (
+      newGoalDueDate == undefined ||
+      newGoalDueDate === null ||
+      newGoalDueDate === ''
+    ) {
       return { isValid: true, conflicts: [] };
     }
 
@@ -141,7 +174,7 @@ export const validateGoalDueDateUpdate = async (
     });
 
     for (const task of tasks) {
-      if (task.dueDate && task.dueDate !== '') {
+      if (task.dueDate && task.dueDate !== null && task.dueDate !== '') {
         const taskDueDate = new Date(task.dueDate);
         if (taskDueDate > newDueDate) {
           conflicts.push(

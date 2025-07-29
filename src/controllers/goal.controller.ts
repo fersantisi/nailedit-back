@@ -15,7 +15,6 @@ import {
 } from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
-import { validateGoalDueDate } from '../utils/validateDueDate';
 
 export const createNewGoal = async (
   req: Request,
@@ -126,25 +125,6 @@ export const updateAGoal = async (
     const { name, description, category, image, dueDate } = req.body;
     const goalIdStr = req.params.goalId;
     const goalIdNumber = +goalIdStr;
-
-    // Get the goal to find its project ID
-    const goal = await getGoalWithProjectId(goalIdStr);
-    if (!goal) {
-      res.status(404).json({ message: 'Goal not found' });
-      return;
-    }
-
-    // Get the project ID from the goal
-    const projectId = goal.projectId;
-
-    // Validate that goal due date is not later than project due date
-    const isDueDateValid = await validateGoalDueDate(projectId, dueDate);
-    if (!isDueDateValid) {
-      res.status(400).json({
-        message: 'Goal due date cannot be later than the project due date',
-      });
-      return;
-    }
 
     const goalUpdate: UpdateGoalDto = new UpdateGoalDto(
       name,
