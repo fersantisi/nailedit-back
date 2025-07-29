@@ -2,11 +2,8 @@ import cron from 'node-cron';
 import { sendMail } from '../services/mailer.service';
 import Project from '../database/models/Project';
 import User from '../database/models/User';
-import ProjectNotification from '../database/models/ProjectNotification';
 import ProjectParticipant from '../database/models/ProjectParticipant';
-import GoalNotification from '../database/models/GoalNotification';
 import Goal from '../database/models/Goal';
-import TaskNotification from '../database/models/TaskNotification';
 import Task from '../database/models/Task';
 import { Op, TableHints } from 'sequelize';
 

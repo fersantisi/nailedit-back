@@ -10,9 +10,9 @@ import {
   updateTask,
   getAllTasks,
   getTaskWithGoalId,
-  removeTaskReminder,
+  /* removeTaskReminder,
   updateTaskReminder,
-  createTaskReminder,
+  createTaskReminder, */
 } from '../services/task.service';
 import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
 import Task from '../database/models/Task';
@@ -226,7 +226,7 @@ export const setTaskCompleted = async (
   }
 };
 
-export const createNewTaskReminder = async (
+/* export const createNewTaskReminder = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -246,9 +246,9 @@ export const createNewTaskReminder = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-};
+}; */
 
-export const updateATaskReminder = async (
+/* export const updateATaskReminder = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -267,9 +267,9 @@ export const updateATaskReminder = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-};
+}; */
 
-export const deleteATaskReminder = async (
+/* export const deleteATaskReminder = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -288,4 +288,4 @@ export const deleteATaskReminder = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-};
+}; */

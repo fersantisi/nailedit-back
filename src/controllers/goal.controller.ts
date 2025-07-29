@@ -9,9 +9,9 @@ import {
   updateGoal,
   getGoalWithProjectId,
   getAllGoals,
-  updateGoalReminder,
-  removeGoalReminder,
-  createGoalReminder,
+  /* updateGoalReminder,
+  removeGoalReminder, */
+  //createGoalReminder,
 } from '../services/goals.service';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
@@ -229,7 +229,7 @@ export const setGoalCompleted = async (
   }
 };
 
-export const createNewGoalReminder = async (
+/* export const createNewGoalReminder = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -237,7 +237,7 @@ export const createNewGoalReminder = async (
     const goalId = Number(req.params.goalId);
     const notificationTime = req.body;
 
-    await createGoalReminder(goalId, notificationTime);
+    //await createGoalReminder(goalId, notificationTime);
 
     res.status(200).json({
       message: 'Reminder created.',
@@ -249,9 +249,9 @@ export const createNewGoalReminder = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-};
+}; */
 
-export const updateAGoalReminder = async (
+/* export const updateAGoalReminder = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -270,9 +270,9 @@ export const updateAGoalReminder = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-};
+}; */
 
-export const deleteAGoalReminder = async (
+/* export const deleteAGoalReminder = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -291,4 +291,4 @@ export const deleteAGoalReminder = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-};
+}; */
