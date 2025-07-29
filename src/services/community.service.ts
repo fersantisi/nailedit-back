@@ -23,6 +23,15 @@ export const sendRequestParticipation = async (
       projectId: projectId,
       userId: userId,
     });
+    const project = await Project.findByPk(projectId,{include: [{model: User}]})
+    if(project){
+      await sendMail(
+          project.user.email,
+          `New participation request!!`,
+          `You have a new participation reques to the project: ${project.name}. Go catch them all!!!`
+      );
+    }
+    
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Failed to send participation request: ${error.message}`);
@@ -64,7 +73,7 @@ export const acceptParticipationRequest = async (
           request.project.user.email,
           `You been accepted to ${request.project.name}!!!!`,
           `You have been accepted to the project: ${request.project.name}. Go catch them all!!!`
-          );
+    );
 
     await request.destroy();
   } catch (error) {
