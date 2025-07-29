@@ -173,7 +173,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 
 export const google = async (req: Request, res: Response): Promise<void> => {
   try {
-    const token = req.body;
+    const token = req.body.credential;
     const tokens = await googleLogIn(token);
     
     if(tokens){
@@ -183,11 +183,9 @@ export const google = async (req: Request, res: Response): Promise<void> => {
       setAuthCookie(res, authToken);
       setRefreshCookie(res, refreshToken);
 
-
-      res.json({ message: 'Login successful', admin: false });
     }
     
-    res.status(200).json({ message: 'Logout successful' });
+    res.status(200).json({ message: 'Login successful', admin: false });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

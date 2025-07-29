@@ -29,7 +29,7 @@ export const googleLogIn = async (
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: GOOGLE_CLIENT_ID,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -42,14 +42,16 @@ export const googleLogIn = async (
 
         const hashedPassword = await bcrypt.hash(randomPassword, 10);
 
+        const googleUsername = payload.email.split('@')[0];
+
         user = await User.create({
-        username: payload.name || payload.email, // Use Google name as username
-        email: payload.email,
-        password: hashedPassword,
-        notification_time: -1,
-      });
+          username: googleUsername || payload.email, 
+          email: payload.email,
+          password: hashedPassword,
+          notification_time: -1,
+        });
     }
-    return tokenGenerator(user);
+    return await tokenGenerator(user);
   } catch (error) {
     console.error('Error in googleLogIn:', error);
     return null;
