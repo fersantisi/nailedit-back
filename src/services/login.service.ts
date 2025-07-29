@@ -46,6 +46,7 @@ export const googleLogIn = async (
         username: payload.name || payload.email, // Use Google name as username
         email: payload.email,
         password: hashedPassword,
+        notification_time: -1,
       });
     }
     return tokenGenerator(user);
