@@ -188,7 +188,7 @@ export const getProject = async (
       project.updated_at,
       project.userId,
       ownerDto,
-      project.privacy
+      project.privacy,
       project.notifications.map((n) => new NotificationDto(n.id, n.notificationTime)),
     );
 
