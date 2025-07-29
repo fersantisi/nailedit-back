@@ -35,7 +35,9 @@ class ProjectParticipationRequest extends Model {
   @Column(DataType.INTEGER)
   declare userId: number;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, {
+    onDelete: 'CASCADE',
+  })
   declare user: User;
 
   @Column({
