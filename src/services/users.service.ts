@@ -2,6 +2,7 @@ import User from '../database/models/User';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { UserProfileDto } from '../dtos/UserProfileDto';
+import { sendMail } from './mailer.service';
 
 export const createNewUser = async (
   username: string,
@@ -140,6 +141,22 @@ export const verifyEmail = async (email: string): Promise<boolean> => {
   }
 };
 
+export const sendRecoveryLink = async (
+  link: string,
+  recipient: string,
+): Promise<void> => {
+  try {
+    await sendMail(
+              recipient,
+              `Recover your password`,
+              `We heard that you lost your GitHub password. Sorry about that!\n\n
+               But don’t worry! You can use the following button to reset your password:`
+          );
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const passwordRecovery = async (
   token: string,
   password: string,
@@ -169,6 +186,8 @@ export const passwordRecovery = async (
     throw error;
   }
 };
+
+
 
 export const getUserProfile = async (
   userId: number,

@@ -6,6 +6,7 @@ import {
   verifyEmail,
   passwordRecovery,
   passwordRecoveryVerify,
+  sendRecoveryLink,
 } from '../services/users.service';
 import { LoginDto } from '../dtos/loginDto';
 import { validateOrReject } from 'class-validator';
@@ -100,17 +101,27 @@ export const forgotPassword = async (
 
   try {
     let link: string;
+    let fullLink:string = "Bad request.";
     if (await verifyEmail(email)) {
       link = generateRecoveryLink(email);
+      
+      // Force host to 5173 for frontend testing
+      const host = 'localhost:5173';
+      const protocol = req.protocol;
+      fullLink = `${protocol}://${host}/auth${link}`
     } else {
-      link = 'Bad email';
+      res
+      .status(400)
+      .json({
+        message: `Mail not found.`});
     }
     // Force host to 5173 for frontend testing
-    const host = 'localhost:5173';
-    const protocol = req.protocol;
-    const fullLink =
-      link !== 'Bad email' ? `${protocol}://${host}/auth${link}` : link;
+
+     
+    
+    
     console.log('Generated recovery link:', fullLink);
+    sendRecoveryLink(fullLink,email);
     res
       .status(200)
       .json({
