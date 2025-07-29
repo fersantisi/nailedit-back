@@ -273,6 +273,6 @@ const checkReminders = async () => {
   }
 };
 
-cron.schedule('* * * * *', checkReminders); 
+cron.schedule('0 9 * * *', checkReminders); 
 
 //'minutes hour dayOfMonth month dayOfWeek
