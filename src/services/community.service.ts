@@ -3,6 +3,7 @@ import ProjectParticipationRequest from '../database/models/ProjectParticipation
 import Project from '../database/models/Project';
 import User from '../database/models/User';
 import ProjectInvitation from '../database/models/ProjectInvite';
+import { sendMail } from './mailer.service';
 
 export const sendRequestParticipation = async (
   projectId: number,
@@ -37,7 +38,7 @@ export const acceptParticipationRequest = async (
   requestId: number,
 ): Promise<void> => {
   try {
-    const request = await ProjectParticipationRequest.findByPk(requestId);
+    const request = await ProjectParticipationRequest.findByPk(requestId,{include: [{model: Project},{model:  User}]});
     if (!request) {
       throw new Error('Participation request not found');
     }
@@ -58,6 +59,13 @@ export const acceptParticipationRequest = async (
       projectId: request.projectId,
       userId: request.userId,
     });
+    
+    await sendMail(
+          request.project.user.email,
+          `You been accepted to ${request.project.name}!!!!`,
+          `You have been accepted to the project: ${request.project.name}. Go catch them all!!!`
+          );
+
     await request.destroy();
   } catch (error) {
     if (error instanceof Error) {
@@ -228,11 +236,20 @@ export const sendInvitation = async (
     if (existingInvite) {
       throw new Error('User already has an invitation to this project');
     }
+    
     await ProjectInvitation.create({
       projectId: projectId,
       toUser: user.id,
       fromUser: fromUser,
     });
+
+    const project = await Project.findByPk(projectId)
+
+    await sendMail(
+          user.email,
+          `Project Invitation`,
+          `You have been invitated to the project: ${project?.name}. Go catch them all!!`
+    );
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Failed to send invitation: ${error.message}`);
@@ -340,7 +357,10 @@ export const acceptInvite = async (
   invitationId: number,
 ): Promise<void> => {
   try {
-    const invitation = await ProjectInvitation.findByPk(invitationId);
+    const invitation = await ProjectInvitation.findByPk(invitationId,{
+      include: [
+        {model: User, as: 'fromUserData'},{model: User, as: 'toUserData'},{model: Project}]
+    });
     if (!invitation) {
       throw new Error('Invitation not found');
     }
@@ -362,6 +382,14 @@ export const acceptInvite = async (
       userId: invitation.toUser,
     });
     await invitation.destroy();
+
+    await sendMail(
+          invitation.fromUserData.email,
+          `Your invitation has been accepted.`,
+          `${invitation.toUserData.username.charAt(0).toUpperCase() 
+            + invitation.toUserData.username.slice(1).toLowerCase()} has accepted your invitation to project ${invitation.project.name}. You better watchout.`
+          );
+
   } catch (error) {
     if (error instanceof Error) {
       if (
