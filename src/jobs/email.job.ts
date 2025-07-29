@@ -174,7 +174,10 @@ const checkReminders = async () => {
         include: [
           { 
             model: Goal,
-            include: [{ model: Task }]
+            where: [{completed: false}],
+            include: [{ model: Task, 
+              where: [{completed: false}] 
+            }]
           },
         ]
       },{ 
@@ -185,7 +188,10 @@ const checkReminders = async () => {
             include: [
               { 
                 model: Goal,
-                include: [{ model: Task }]
+                where: [{completed: false}],
+                include: [{ model: Task, 
+                  where: [{completed: false}] 
+                }]
               }
             ]
           }
