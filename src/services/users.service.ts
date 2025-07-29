@@ -150,7 +150,7 @@ export const sendRecoveryLink = async (
               recipient,
               `Recover your password`,
               `We heard that you lost your GitHub password. Sorry about that!\n\n
-               But don’t worry! You can use the following button to reset your password:`
+               But don’t worry! You can use the following button to reset your password: ${link}`
           );
   } catch (error) {
     throw error;
