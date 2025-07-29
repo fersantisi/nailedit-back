@@ -6,17 +6,16 @@ import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
 import Goal from '../database/models/Goal';
 import Project from '../database/models/Project';
 import { validateTaskDueDate } from '../utils/validateDueDate';
-import TaskNotification from '../database/models/TaskNotification';
 import { NotificationDto } from '../dtos/NotificationDto';
 
 export const createTask = async (task: TaskDto) => {
   try {
     const existingTask = await Task.findOne({
-      where: { name: task.name },
+      where: { name: task.name, goalId: task.goalId },
     });
 
     if (existingTask) {
-      throw new Error('task name already in use.');
+      throw new Error('Task name already in use.');
     }
 
     // Validate that the task due date doesn't exceed the goal's due date
@@ -57,9 +56,7 @@ export const deleteTask = async (taskId: string) => {
 
 export const gettask = async (taskId: string): Promise<TaskDataDto> => {
   try {
-    const task = await Task.findByPk(taskId,
-      {include: [{model:TaskNotification}]}
-    );
+    const task = await Task.findByPk(taskId);
     if (!task) {
       throw new Error('task not found');
     }
@@ -73,8 +70,7 @@ export const gettask = async (taskId: string): Promise<TaskDataDto> => {
       task.dueDate,
       task.created_at,
       task.updated_at,
-      task.completed,
-      task.notifications.map((n) => new NotificationDto(n.id, n.notificationTime)),
+      task.completed
     );
 
     return taskDto;
@@ -203,7 +199,7 @@ export const getTaskWithGoalId = async (taskId: string) => {
   }
 };
 
-export const createTaskReminder = async (
+/* export const createTaskReminder = async (
   taskId: number,
   notificationTime: number,
 ):Promise<void> => {
@@ -224,9 +220,9 @@ export const createTaskReminder = async (
       throw new Error(error.message);
     }
   }
-};
+}; */
 
-export const updateTaskReminder = async (
+/* export const updateTaskReminder = async (
   reminderId: number,
   notificationTime: number,
 ):Promise<void> => {
@@ -247,9 +243,9 @@ export const updateTaskReminder = async (
       throw new Error(error.message);
     }
   }
-};
+}; */
 
-export const removeTaskReminder= async(
+/* export const removeTaskReminder= async(
   reminderId: number
 ):Promise<void> => {
   try {
@@ -268,4 +264,4 @@ export const removeTaskReminder= async(
       throw new Error(error.message);
     }
   }
-}
+} */

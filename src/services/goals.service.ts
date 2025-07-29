@@ -4,13 +4,12 @@ import { GoalDto } from '../dtos/GoalDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
 import Project from '../database/models/Project';
 import { validateGoalDueDateUpdate, validateGoalDueDate } from '../utils/validateDueDate';
-import GoalNotification from '../database/models/GoalNotification';
 import { NotificationDto } from '../dtos/NotificationDto';
 
 export const createGoal = async (goal: GoalDto) => {
   try {
     const existingGoal = await Goal.findOne({
-      where: { name: goal.name },
+      where: { name: goal.name, projectId: goal.projectId },
     });
 
     if (existingGoal) {
@@ -55,9 +54,7 @@ export const deleteGoal = async (goalId: string) => {
 
 export const getGoal = async (goalId: string): Promise<GoalDataDto> => {
   try {
-    const goal = await Goal.findByPk(goalId,
-      {include: [{model: GoalNotification}]}
-    );
+    const goal = await Goal.findByPk(goalId);
     if (!goal) {
       throw new Error('Goal not found');
     }
@@ -70,8 +67,7 @@ export const getGoal = async (goalId: string): Promise<GoalDataDto> => {
       goal.dueDate,
       goal.created_at,
       goal.updated_at,
-      goal.completed,
-      goal.notifications.map((n) => new NotificationDto(n.id, n.notificationTime))
+      goal.completed
     );
 
     return goalDto;
@@ -138,9 +134,7 @@ export const updateGoal = async (newData: UpdateGoalDto) => {
 
 export const getGoalWithProjectId = async (goalId: string) => {
   try {
-    const goal = await Goal.findByPk(goalId,{
-      include: [{model: GoalNotification}],
-    });
+    const goal = await Goal.findByPk(goalId);
     if (!goal) {
       throw new Error('Goal not found');
     }
@@ -187,7 +181,7 @@ export const getAllGoals = async (userId?: number): Promise<any[]> => {
   }
 };
 
-export const createGoalReminder = async (
+/* export const createGoalReminder = async (
   goalId: number,
   notificationTime: number,
 ):Promise<void> => {
@@ -208,9 +202,9 @@ export const createGoalReminder = async (
       throw new Error(error.message);
     }
   }
-};
+}; */
 
-export const updateGoalReminder = async (
+/* export const updateGoalReminder = async (
   reminderId: number,
   notificationTime: number,
 ):Promise<void> => {
@@ -230,9 +224,9 @@ export const updateGoalReminder = async (
       throw new Error(error.message);
     }
   }
-};
+}; */
 
-export const removeGoalReminder= async(
+/* export const removeGoalReminder= async(
   reminderId: number
 ):Promise<void> => {
   try {
@@ -250,4 +244,4 @@ export const removeGoalReminder= async(
       throw new Error(error.message);
     }
   }
-}
+} */

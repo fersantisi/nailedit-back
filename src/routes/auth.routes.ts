@@ -6,11 +6,13 @@ import {
   recoverPassword,
   logout,
   verifyRecoveryToken,
+  google,
 } from '../controllers/auth.controller';
 
 const router = Router();
 
 router.post('/login', getLogin);
+router.post('/google', google);
 router.post('/signin', createUser);
 router.post('/forgot-password', forgotPassword);
 router.post('/recoverPassword/:jwt', recoverPassword);

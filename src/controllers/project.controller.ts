@@ -9,9 +9,9 @@ import {
   searchProjects,
   updateProject,
   checkProjectPermissions,
-  createProjectReminder,
-  updateProjectReminder,
-  removeProjectReminder,
+  //createProjectReminder,
+  //updateProjectReminder,
+  //removeProjectReminder,
 } from '../services/project.service';
 import { validateProjectId } from '../utils/validateProjectId';
 import { validateOrReject } from 'class-validator';
@@ -225,7 +225,7 @@ export const checkProjectPermissionsController = async (
   }
 };
 
-export const createNewProjectReminder = async (
+/* export const createNewProjectReminder = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -245,9 +245,9 @@ export const createNewProjectReminder = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-};
+}; */
 
-export const updateAProjectReminder = async (
+/* export const updateAProjectReminder = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -266,9 +266,9 @@ export const updateAProjectReminder = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-};
+}; */
 
-export const deleteAProjectReminder = async (
+/* export const deleteAProjectReminder = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -287,4 +287,4 @@ export const deleteAProjectReminder = async (
       res.status(500).json({ message: 'Unknown error' });
     }
   }
-};
+}; */

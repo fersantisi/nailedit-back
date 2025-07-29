@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { setAuthCookie, setRefreshCookie } from '../utils/cookie';
-import { logIn } from '../services/login.service';
+import { googleLogIn, logIn } from '../services/login.service';
 import {
   createNewUser,
   verifyEmail,
@@ -166,6 +166,26 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     console.log('Logout successful');
 
     res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const google = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const token = req.body.credential;
+    const tokens = await googleLogIn(token);
+    
+    if(tokens){
+      
+      const { authToken, refreshToken } = tokens;
+
+      setAuthCookie(res, authToken);
+      setRefreshCookie(res, refreshToken);
+
+    }
+    
+    res.status(200).json({ message: 'Login successful', admin: false });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

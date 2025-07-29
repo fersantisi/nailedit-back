@@ -15,7 +15,6 @@ import { unreserveStock } from './stock.service';
 import { Op } from 'sequelize';
 import ProjectParticipant from '../database/models/ProjectParticipant';
 import { validateProjectDueDateUpdate } from '../utils/validateDueDate';
-import ProjectNotification from '../database/models/ProjectNotification';
 import { NotificationDto } from '../dtos/NotificationDto';
 
 export const createProject = async (project: ProjectDto) => {
@@ -162,8 +161,6 @@ export const getProject = async (
           model: User,
           as: 'user',
           attributes: ['id', 'username', 'email'],
-        },{
-          model: ProjectNotification,
         }
       ],
     });
@@ -188,8 +185,7 @@ export const getProject = async (
       project.updated_at,
       project.userId,
       ownerDto,
-      project.privacy,
-      project.notifications.map((n) => new NotificationDto(n.id, n.notificationTime)),
+      project.privacy
     );
 
     return projectDataDTO;
@@ -278,11 +274,7 @@ export const getProjectByIdService = async (
   projectId: string,
 ): Promise<Project | null> => {
   try {
-    const project = await Project.findByPk(projectId,{
-      include: [{
-        model: ProjectNotification,
-      }]
-    });
+    const project = await Project.findByPk(projectId);
     if (!project) {
       throw new Error('Project not found');
     }
@@ -420,9 +412,6 @@ export const getSharedProjects = async (
           model: User,
           as: 'user',
           attributes: ['id', 'username', 'email'],
-        },{
-          model: ProjectNotification,
-          attributes: ['notificationTime'],
         }
       ],
     });
@@ -493,7 +482,7 @@ export const checkProjectPermissions = async (
   }
 };
 
-export const createProjectReminder = async (
+/* export const createProjectReminder = async (
   projectId: number,
   notificationTime: number,
 ):Promise<void> => {
@@ -514,9 +503,9 @@ export const createProjectReminder = async (
       throw new Error(error.message);
     }
   }
-};
+}; */
 
-export const updateProjectReminder = async (
+/* export const updateProjectReminder = async (
   reminderId: number,
   notificationTime: number,
 ):Promise<void> => {
@@ -536,9 +525,9 @@ export const updateProjectReminder = async (
       throw new Error(error.message);
     }
   }
-};
+}; */
 
-export const removeProjectReminder= async(
+/* export const removeProjectReminder= async(
   reminderId: number
 ):Promise<void> => {
   try {
@@ -556,4 +545,4 @@ export const removeProjectReminder= async(
       throw new Error(error.message);
     }
   }
-}
+} */
