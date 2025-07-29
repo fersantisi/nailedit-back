@@ -47,7 +47,14 @@ export const acceptParticipationRequest = async (
   requestId: number,
 ): Promise<void> => {
   try {
-    const request = await ProjectParticipationRequest.findByPk(requestId,{include: [{model: Project},{model:  User}]});
+    const request = await ProjectParticipationRequest.findByPk(requestId, {
+      include: [
+        { model: Project, include: [{ model: User }] },
+        { model: User },
+      ],
+    });
+    console.log(request);
+    
     if (!request) {
       throw new Error('Participation request not found');
     }
@@ -70,7 +77,7 @@ export const acceptParticipationRequest = async (
     });
     
     await sendMail(
-          request.project.user.email,
+          request.user.email,
           `You been accepted to ${request.project.name}!!!!`,
           `You have been accepted to the project: ${request.project.name}. Go catch them all!!!`
     );
