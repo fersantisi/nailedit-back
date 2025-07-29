@@ -2,6 +2,7 @@ import ProjectParticipant from '../database/models/ProjectParticipant';
 import ProjectParticipationRequest from '../database/models/ProjectParticipationRequest';
 import Project from '../database/models/Project';
 import User from '../database/models/User';
+import ProjectInvitation from '../database/models/ProjectInvite';
 
 export const sendRequestParticipation = async (
   projectId: number,
@@ -190,6 +191,279 @@ export const getUserParticipationRequests = async (
     } else {
       throw new Error(
         'An unknown error occurred while getting user participation requests',
+      );
+    }
+  }
+};
+
+export const sendInvitation = async (
+  projectId: number,
+  fromUser: number,
+  toUser: number,
+): Promise<void> => {
+  try {
+    const user = await User.findOne({
+      where: {
+        username: toUser,
+      },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const participant = await ProjectParticipant.findOne({
+      where: {
+        projectId: projectId,
+        userId: user.id,
+      },
+    });
+    if (participant) {
+      throw new Error('User is already a participant in this project');
+    }
+    const existingInvite = await ProjectInvitation.findOne({
+      where: {
+        projectId: projectId,
+        toUser: user.id,
+      },
+    });
+    if (existingInvite) {
+      throw new Error('User already has an invitation to this project');
+    }
+    await ProjectInvitation.create({
+      projectId: projectId,
+      toUser: user.id,
+      fromUser: fromUser,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to send invitation: ${error.message}`);
+    } else {
+      throw new Error(
+        'An unknown error occurred while sending invitation',
+      );
+    }
+  }
+};
+
+export const getUserInvites = async (
+  userId: number,
+): Promise<ProjectInvitation[]> => {
+  try {
+    const invites = await ProjectInvitation.findAll({
+      where: { toUser: userId },
+      include: [
+        {
+          model: Project,
+          as: 'project',
+          attributes: ['id', 'name', 'description', 'category', 'image'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email'],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: 'fromUserData',        
+          attributes: ['id', 'username', 'email'],
+        },
+        {
+          model: User,
+          as: 'toUserData',          
+          attributes: ['id', 'username', 'email'],
+        },
+      ],
+      order: [['created_at', 'DESC']],
+    });
+    return invites;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(
+        `Failed to get user invites: ${error.message}`,
+      );
+    } else {
+      throw new Error(
+        'An unknown error occurred while getting user invites',
+      );
+    }
+  }
+};
+
+export const getUserSentInvites = async (
+  userId: number,
+): Promise<ProjectInvitation[]> => {
+  try {
+    const invites = await ProjectInvitation.findAll({
+      where: { fromUser: userId },
+      include: [
+        {
+          model: Project,
+          as: 'project',
+          attributes: ['id', 'name', 'description', 'category', 'image'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email'],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: 'fromUserData',        
+          attributes: ['id', 'username', 'email'],
+        },
+        {
+          model: User,
+          as: 'toUserData',          
+          attributes: ['id', 'username', 'email'],
+        },
+      ],
+      order: [['created_at', 'DESC']],
+    });
+    return invites;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(
+        `Failed to get user sent invites: ${error.message}`,
+      );
+    } else {
+      throw new Error(
+        'An unknown error occurred while getting user sent invites',
+      );
+    }
+  }
+};
+
+export const acceptInvite = async (
+  invitationId: number,
+): Promise<void> => {
+  try {
+    const invitation = await ProjectInvitation.findByPk(invitationId);
+    if (!invitation) {
+      throw new Error('Invitation not found');
+    }
+
+    // Check if user is already a participant
+    const existingParticipant = await ProjectParticipant.findOne({
+      where: {
+        projectId: invitation.projectId,
+        userId: invitation.toUser,
+      },
+    });
+
+    if (existingParticipant) {
+      throw new Error('User is already a participant in this project');
+    }
+
+    await ProjectParticipant.create({
+      projectId: invitation.projectId,
+      userId: invitation.toUser,
+    });
+    await invitation.destroy();
+  } catch (error) {
+    if (error instanceof Error) {
+      if (
+        error.message.includes('already exists') ||
+        error.message.includes('unique')
+      ) {
+        throw new Error('User is already a participant in this project');
+      }
+      throw new Error(
+        `Failed to accept invitation: ${error.message}`,
+      );
+    } else {
+      throw new Error(
+        'An unknown error occurred while accepting invitation',
+      );
+    }
+  }
+};
+
+export const rejectInvite = async (
+  invitationId: number,
+): Promise<void> => {
+  try {
+    const invitation = await ProjectInvitation.findByPk(invitationId);
+    if (!invitation) {
+      throw new Error('Invitation not found');
+    }
+    await invitation.destroy();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(
+        `Failed to reject invitation: ${error.message}`,
+      );
+    } else {
+      throw new Error(
+        'An unknown error occurred while rejecting invitation',
+      );
+    }
+  }
+};
+
+export const deleteInvitation = async (
+  inviteId: number,
+): Promise<void> => {
+  try {
+    const invitation = await ProjectInvitation.findByPk(inviteId);
+    if (!invitation) {
+      throw new Error('Invitation not found.');
+    }
+    await invitation.destroy();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to delete invitation: ${error.message}`);
+    } else {
+      throw new Error(
+        'An unknown error occurred while deleting invitation',
+      );
+    }
+  }
+};
+
+export const getProjectInvites = async (
+  projectId: number,
+): Promise<ProjectInvitation[]> => {
+  try {
+    const invites = await ProjectInvitation.findAll({
+      where: { projectId: projectId },
+      include: [
+        {
+          model: Project,
+          as: 'project',
+          attributes: ['id', 'name', 'description', 'category', 'image'],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'username', 'email'],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: 'fromUserData',        
+          attributes: ['id', 'username', 'email'],
+        },
+        {
+          model: User,
+          as: 'toUserData',          
+          attributes: ['id', 'username', 'email'],
+        },
+      ],
+      order: [['created_at', 'DESC']],
+    });
+    return invites;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(
+        `Failed to get user invites: ${error.message}`,
+      );
+    } else {
+      throw new Error(
+        'An unknown error occurred while getting user invites',
       );
     }
   }

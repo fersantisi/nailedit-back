@@ -1,13 +1,21 @@
 import { Request, Response } from 'express';
 import {
+  acceptInvite,
   acceptParticipationRequest,
+  deleteInvitation,
   getallParticipationRequests,
+  getProjectInvites,
   getProjectParticipants,
+  getUserInvites,
+  getUserSentInvites,
+  rejectInvite,
   rejectParticipationRequest,
   removeProjectParticipant,
+  sendInvitation,
   sendRequestParticipation,
 } from '../services/community.service';
 import { getAllProjects } from '../services/project.service';
+import { getTokenPayload } from '../services/token.service';
 
 export const requestParticipation = async (
   req: Request,
@@ -115,6 +123,113 @@ export const getAllProjectParticipants = async (
     const projectId = Number(req.params.projectId);
     const participants = await getProjectParticipants(projectId);
     res.status(200).json(participants);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const getAllInvites = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
+    const invites =  await getUserInvites(userId);
+    res.status(200).json(invites);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const getAllSentInvites = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
+    const invites = await getUserSentInvites(userId);
+    res.status(200).json(invites);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const getAllProjectInvites = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const projectId = Number(req.params.projectId);
+    const invites = await getProjectInvites(projectId);
+    res.status(200).json(invites);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const acceptInviteToProject = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const inviteId = Number(req.params.inviteId);
+    await acceptInvite(inviteId);
+    res.status(200).json(`Invite accepted succesfully.`);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const rejectInviteToProject = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const inviteId = Number(req.params.inviteId);
+    await rejectInvite(inviteId);
+    res.status(200).json(`Invite rejected succesfully.`);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const inviteToProject = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const fromUser = await getTokenPayload(req.cookies.authToken).userId;
+    const projectId = Number(req.params.projectId);
+    const { toUser } = req.body;
+    await sendInvitation(projectId, fromUser, toUser);
+    res.status(200).json(`${toUser} invited succesfully.`);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const deleteInvite = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const inviteId = Number(req.params.inviteId);
+    await deleteInvitation(inviteId);
+    res.status(200).json(`Invitation deleted succesfully.`);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
