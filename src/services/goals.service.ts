@@ -10,7 +10,7 @@ import { NotificationDto } from '../dtos/NotificationDto';
 export const createGoal = async (goal: GoalDto) => {
   try {
     const existingGoal = await Goal.findOne({
-      where: { name: goal.name },
+      where: { name: goal.name, projectId: goal.projectId },
     });
 
     if (existingGoal) {

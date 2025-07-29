@@ -12,11 +12,11 @@ import { NotificationDto } from '../dtos/NotificationDto';
 export const createTask = async (task: TaskDto) => {
   try {
     const existingTask = await Task.findOne({
-      where: { name: task.name },
+      where: { name: task.name, goalId: task.goalId },
     });
 
     if (existingTask) {
-      throw new Error('task name already in use.');
+      throw new Error('Task name already in use.');
     }
 
     // Validate that the task due date doesn't exceed the goal's due date

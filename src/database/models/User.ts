@@ -9,6 +9,7 @@ import {
 } from 'sequelize-typescript';
 import Proyect from './Project';
 import Stock from "./Stock";
+import ProjectParticipant from './ProjectParticipant';
 
 interface UserAttributes {
   id: number;
@@ -74,6 +75,9 @@ class User extends Model<UserAttributes, UserCreationAttributes> {
     type: DataType.INTEGER,
   })
   declare notification_time: number;
+
+  @HasMany(() => ProjectParticipant)
+  declare projectParticipants: ProjectParticipant[];
 }
 
 export default User;
