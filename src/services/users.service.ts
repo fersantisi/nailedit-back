@@ -26,6 +26,7 @@ export const createNewUser = async (
       username,
       email,
       password: hashedPassword,
+      notification_time: -1
     });
     return true;
   } catch (error) {
@@ -118,6 +119,7 @@ export const createAdmin = async (): Promise<void> => {
       username: 'admin',
       email: 'admin@admin.com',
       password: hashedPassword,
+      notification_time: -1
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -262,3 +264,26 @@ export const passwordRecoveryVerify = async (token: string): Promise<any> => {
     throw error;
   }
 };
+
+export const setReminderTime = async (userId: number, reminderTime: number): Promise<void> => {
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error('User not Found');
+    }
+    user.notification_time = reminderTime;
+    user.save();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(
+        `Failed to get user participation requests: ${error.message}`,
+      );
+    } else {
+      throw new Error(
+        'An unknown error occurred while getting user participation requests',
+      );
+    }
+  }
+
+}

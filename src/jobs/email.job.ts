@@ -8,7 +8,9 @@ import GoalNotification from '../database/models/GoalNotification';
 import Goal from '../database/models/Goal';
 import TaskNotification from '../database/models/TaskNotification';
 import Task from '../database/models/Task';
+import { Op, TableHints } from 'sequelize';
 
+/*
 const checkReminders = async () => {
   const now = new Date();
   const projectNotifications = await ProjectNotification.findAll({
@@ -160,7 +162,113 @@ const checkReminders = async () => {
     };
   };
 };
+*/
 
+const checkReminders = async () => {
+  const now = new Date();
+  const users = await User.findAll({
+    where: { notification_time: { [Op.ne]: -1 } },
+    include: [
+      { 
+        model: Project,
+        include: [
+          { 
+            model: Goal,
+            include: [{ model: Task }]
+          },
+        ]
+      },{ 
+        model: ProjectParticipant,
+        include: [
+          { 
+            model: Project, 
+            include: [
+              { 
+                model: Goal,
+                include: [{ model: Task }]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  });
+
+  const taskRecipients = [];
+  const goalRecipients = [];
+  const projectRecipients = [];
+
+  for (const user of users) {
+    const notificationTime = user.notification_time;
+    for(const project of user.proyects){
+      for(const goal of project.goal){
+        for(const task of goal.task){
+
+      
+          const trigger = new Date(task.dueDate);
+
+          trigger.setDate(trigger.getDate()-notificationTime);
+
+          if(now>= trigger){
+            taskRecipients.push({recipient: user.email,task: task.name,date: new Date(task.dueDate).toDateString()})
+          };
+        };
+
+        const goalTrigger = new Date(goal.dueDate);
+
+        goalTrigger.setDate(goalTrigger.getDate()-notificationTime);
+
+        if(now>= goalTrigger){
+          goalRecipients.push({recipient: user.email,goal: goal.name,date: new Date(goal.dueDate).toDateString()})
+        };
+      };
+      const projectTrigger = new Date(project.dueDate);
+      
+
+      projectTrigger.setDate(projectTrigger.getDate()-notificationTime);
+
+      if(now>= projectTrigger){
+        projectRecipients.push({recipient: user.email,project: project.name,date: new Date(project.dueDate).toDateString()})
+      };
+    };
+  };
+
+  for(const reminder of taskRecipients){
+    try {
+      await sendMail(
+      reminder.recipient,
+      `Reminder: ${reminder.task} due soon`,
+      `Your task "${reminder.task}" is due on ${reminder.date}`
+      );
+    } catch (error) {
+      console.error(`Failed to send email to ${reminder.recipient}:`, error);
+    };
+  }
+
+  for(const reminder of goalRecipients){
+    try {
+      await sendMail(
+      reminder.recipient,
+      `Reminder: ${reminder.goal} due soon`,
+      `Your goal "${reminder.goal}" is due on ${reminder.date}`
+      );
+    } catch (error) {
+      console.error(`Failed to send email to ${reminder.recipient}:`, error);
+    };
+  }
+
+  for(const reminder of projectRecipients){
+    try {
+      await sendMail(
+      reminder.recipient,
+      `Reminder: ${reminder.project} due soon`,
+      `Your project "${reminder.project}" is due on ${reminder.date}`
+      );
+    } catch (error) {
+      console.error(`Failed to send email to ${reminder.recipient}:`, error);
+    };
+  }
+};
 
 cron.schedule('0 9 * * *', checkReminders); 
 
