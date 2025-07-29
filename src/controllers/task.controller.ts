@@ -10,6 +10,9 @@ import {
   updateTask,
   getAllTasks,
   getTaskWithGoalId,
+  removeTaskReminder,
+  updateTaskReminder,
+  createTaskReminder,
 } from '../services/task.service';
 import { UpdateTaskDto } from '../dtos/UpdateTaskDto';
 import Task from '../database/models/Task';
@@ -220,5 +223,69 @@ export const setTaskCompleted = async (
     res.status(200).json({ message: 'Task completion updated', completed });
   } catch (error) {
     res.status(500).json({ message: 'Error updating task completion' });
+  }
+};
+
+export const createNewTaskReminder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const taskId = Number(req.params.taskId);
+    const notificationTime = req.body;
+
+    await createTaskReminder(taskId, notificationTime);
+
+    res.status(200).json({
+      message: 'Reminder created.',
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};
+
+export const updateATaskReminder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+
+    const {reminderId , notificationTime} = req.body;
+    await updateTaskReminder(reminderId, notificationTime);
+
+    res.status(200).json({
+      message: 'Reminder updated.',
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
+  }
+};
+
+export const deleteATaskReminder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const remainderId = req.body;
+
+    await removeTaskReminder(remainderId);
+
+    res.status(200).json({
+      message: 'Reminder deleted.',
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Unknown error' });
+    }
   }
 };

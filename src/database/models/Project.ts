@@ -1,13 +1,9 @@
-import { INTEGER, Optional } from 'sequelize';
 import {
   Table,
   Column,
   DataType,
   Model,
   HasMany,
-  PrimaryKey,
-  AutoIncrement,
-  Unique,
   ForeignKey,
   CreatedAt,
   UpdatedAt,
@@ -17,9 +13,9 @@ import User from './User';
 import Goal from './Goal';
 import Note from './Note';
 import ReservedStock from './ReservedStock';
-import Stock from './ReservedStock';
 import File from './File';
 import ProjectParticipant from './ProjectParticipant';
+import ProjectNotification from './ProjectNotification';
 
 @Table({
   timestamps: true,
@@ -39,6 +35,11 @@ class Project extends Model {
     type: DataType.INTEGER,
   })
   declare userId: number;
+
+  @Column({
+    type: DataType.BOOLEAN,
+  })
+  declare privacy: boolean;
 
   @Column({
     type: DataType.STRING,
@@ -90,6 +91,9 @@ class Project extends Model {
 
   @HasMany(() => ProjectParticipant)
   declare participants: ProjectParticipant[];
+
+  @HasMany(() => ProjectNotification)
+  declare notifications: ProjectNotification[];
 }
 
 export default Project;

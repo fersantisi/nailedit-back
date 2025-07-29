@@ -13,6 +13,7 @@ import User from './User';
 import Project from './Project';
 import Note from './Note';
 import Task from './Task';
+import GoalNotification from './GoalNotification';
 
 @Table({
   timestamps: true,
@@ -70,6 +71,12 @@ class Goal extends Model {
 
   @HasMany(() => Task)
   declare task: Task[];
+
+  @HasMany(() => GoalNotification)
+  declare notification: GoalNotification[];
+
+  @HasMany(() => GoalNotification)
+  declare notifications: GoalNotification[];
 }
 
 export default Goal;

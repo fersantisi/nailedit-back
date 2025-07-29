@@ -1,13 +1,11 @@
 import { Request, Response } from 'express';
-import User from '../database/models/User';
 import {
-  createNewUser,
   getUserData,
   updateUserPassword,
   getUserProfile,
   updateUserPasswordWithValidation,
+  setReminderTime,
 } from '../services/users.service';
-import { verify } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { getTokenPayload } from '../services/token.service';
 import { validateOrReject } from 'class-validator';
@@ -182,3 +180,20 @@ export const getUserPendingRequests = async (
     }
   }
 };
+
+export const setNotificationTimer = async(
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const userId = await getTokenPayload(req.cookies.authToken).userId;
+    const timer = req.body.NotificationTimer;
+
+    await setReminderTime(userId,timer);
+
+    res.status(200).json("Notification time set.")
+  } catch (error) {
+    
+  }
+}
+

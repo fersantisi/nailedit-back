@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDate,
   IsDateString,
   IsNotEmpty,
@@ -32,11 +33,16 @@ export class UpdateProjectDto {
   declare dueDate: string;
 
   @IsNotEmpty()
+  @IsBoolean()
+  declare privacy: boolean;
+
+  @IsNotEmpty()
   @IsNumber()
   declare projectId: number;
 
   constructor(
     name: string,
+    privacy: boolean,
     description: string,
     category: string,
     image: string,
@@ -49,5 +55,6 @@ export class UpdateProjectDto {
     this.image = image;
     this.dueDate = dueDate;
     this.projectId = projectId;
+    this.privacy = privacy;
   }
 }

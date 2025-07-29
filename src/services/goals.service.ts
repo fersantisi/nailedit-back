@@ -1,10 +1,11 @@
 import Goal from '../database/models/Goal';
-import Task from '../database/models/Task';
 import { GoalDataDto } from '../dtos/GoalDataDto';
 import { GoalDto } from '../dtos/GoalDto';
 import { UpdateGoalDto } from '../dtos/UpdateGoalDto';
 import Project from '../database/models/Project';
 import { validateGoalDueDateUpdate, validateGoalDueDate } from '../utils/validateDueDate';
+import GoalNotification from '../database/models/GoalNotification';
+import { NotificationDto } from '../dtos/NotificationDto';
 
 export const createGoal = async (goal: GoalDto) => {
   try {
@@ -54,10 +55,13 @@ export const deleteGoal = async (goalId: string) => {
 
 export const getGoal = async (goalId: string): Promise<GoalDataDto> => {
   try {
-    const goal = await Goal.findByPk(goalId);
+    const goal = await Goal.findByPk(goalId,
+      {include: [{model: GoalNotification}]}
+    );
     if (!goal) {
       throw new Error('Goal not found');
     }
+
 
     const goalDto: GoalDataDto = new GoalDataDto(
       goal.id,
@@ -67,6 +71,7 @@ export const getGoal = async (goalId: string): Promise<GoalDataDto> => {
       goal.created_at,
       goal.updated_at,
       goal.completed,
+      goal.notifications.map((n) => new NotificationDto(n.id, n.notificationTime))
     );
 
     return goalDto;
@@ -133,7 +138,9 @@ export const updateGoal = async (newData: UpdateGoalDto) => {
 
 export const getGoalWithProjectId = async (goalId: string) => {
   try {
-    const goal = await Goal.findByPk(goalId);
+    const goal = await Goal.findByPk(goalId,{
+      include: [{model: GoalNotification}],
+    });
     if (!goal) {
       throw new Error('Goal not found');
     }
@@ -179,3 +186,68 @@ export const getAllGoals = async (userId?: number): Promise<any[]> => {
     throw new Error('Server error, check server console for more information');
   }
 };
+
+export const createGoalReminder = async (
+  goalId: number,
+  notificationTime: number,
+):Promise<void> => {
+  try {
+    const existingReminder = await GoalNotification.findOne({where: {goalId: goalId, notificationTime: notificationTime }});
+
+    if (existingReminder) {
+      throw new Error('Reminder already exists.');
+    };
+
+    GoalNotification.create({
+      goalId,
+      notificationTime,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+};
+
+export const updateGoalReminder = async (
+  reminderId: number,
+  notificationTime: number,
+):Promise<void> => {
+  try {
+
+    const existingReminder = await GoalNotification.findByPk(reminderId);
+    if (!existingReminder) {
+      throw new Error('Reminder not found.');
+    };
+
+    existingReminder.notificationTime = notificationTime;
+    await existingReminder.save();
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+};
+
+export const removeGoalReminder= async(
+  reminderId: number
+):Promise<void> => {
+  try {
+
+    const existingReminder = await GoalNotification.findByPk(reminderId);
+    if (!existingReminder) {
+      throw new Error('Reminder not found.');
+    };
+
+    existingReminder.destroy();
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  }
+}

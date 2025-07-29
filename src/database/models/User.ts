@@ -5,10 +5,7 @@ import {
   DataType,
   Model,
   HasMany,
-  PrimaryKey,
-  AutoIncrement,
   Unique,
-  ForeignKey,
 } from 'sequelize-typescript';
 import Proyect from './Project';
 import Stock from "./Stock";
@@ -18,6 +15,7 @@ interface UserAttributes {
   username: string;
   email: string;
   password: string;
+  notification_time: number;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
@@ -71,6 +69,11 @@ class User extends Model<UserAttributes, UserCreationAttributes> {
 
   @HasMany(() => Stock)
   declare stocks: Stock[];
+
+  @Column({
+    type: DataType.INTEGER,
+  })
+  declare notification_time: number;
 }
 
 export default User;
